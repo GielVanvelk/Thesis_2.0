@@ -147,6 +147,53 @@ if not simulation and use_jr3 then
     FTsensor = require("etasl_FT_JR3")
     FTsensor.FTsensor_deployer(etaslcore,1/freq)
 end
+
+-- ====================================== Giel Component
+depl:import("giel_component")
+depl:loadComponent("GielComponent","gcomp::GielComponent")
+gcomp_gui= depl:getPeer("GielComponent")
+depl:setActivity(gcomp_gui:getName(), 1/freq, 50, rtt.globals.ORO_SCHED_RT)
+
+gcomp_gui:configure()
+gcomp_gui:start()
+
+-- =====================　seom master + force sensor + components =========================================================　
+--depl:import( "ati_iface" )
+--depl:loadComponent( "AtiIface", "ati::AtiIface" )
+--ati_iface = depl:getPeer( "AtiIface" )
+
+--depl:setActivity( ati_iface:getName( ), timefreq_sensor, 50, rtt.globals.ORO_SCHED_RT)
+--ati_iface:getProperty( "scale_matrix" ):set( scale_matrix )
+--ati_iface:getProperty( "calibration_matrix" ):set( calibration_matrix )
+--ati_iface:getProperty( "lowpass_filter_on" ):set( lowpass_filter_on )
+--ati_iface:getProperty( "filter_bandwidth" ):set( filter_bandwidth )
+--ati_iface:getProperty( "filter_order" ):set( filter_order )
+--ati_iface:getProperty( "compensate_deadband" ):set( compensate_deadband )
+--ati_iface:getProperty( "f_deadband" ):set( f_deadband )
+--ati_iface:getProperty( "m_deadband" ):set( m_deadband )
+--ati_iface:configure()
+
+--depl:import( "soem_master" )
+--depl:import( "soem_beckhoff_drivers" )
+--depl:loadComponent( "soem_master", "soem_master::SoemMasterComponent" )
+--soem_master = depl:getPeer( "soem_master" )
+
+--depl:setActivity( soem_master:getName( ), timefreq_sensor, 50, rtt.globals.ORO_SCHED_RT)
+--soem_master:getProperty( "ifname" ):set( ifname )
+--soem_master:configure( )
+--if not soem_master:isConfigured( ) then -- Switch the interface names in case soem_master doesn't configure.
+--    soem_master:getProperty( "ifname" ):set( ifname2 )
+--    soem_master:configure( )
+--end
+--
+--cp = rtt.Variable( "ConnPolicy" )
+--depl:connect( soem_master:getName( )..".Slave_1002.values", ati_iface:getName( )..".in_ai1_port", cp )
+--depl:connect( soem_master:getName( )..".Slave_1003.values", ati_iface:getName( )..".in_ai2_port", cp )
+--soem_master:start( )
+--depl:connect(ati_iface:getName( )..".out_W_ati","etaslcore.force_sensor",cp )
+--depl:stream( ati_iface:getName( )..".out_W_ati" , rtt.provides( "ros" ):topic("/wrench_raw") )
+--ati_iface:start( )
+
 -- ====================================== Supervisor =========================================
 depl:loadComponent("Supervisor", "OCL::LuaComponent")
 sup = depl:getPeer("Supervisor")
@@ -156,7 +203,7 @@ define_property( sup, "robot_etasl_dir", "string", robot_etasl_dir, "Directory o
 define_property( sup, "depl_robot_file", "string", depl_robot_file, "Directory of the file containing deployment of the robot" )
 
 sup:exec_file(etasl_application_dir.."/scripts/components/fsm_component.lua")
-sup:getProperty("state_machine"):set(etasl_application_dir.."/scripts/rfsm/fsm_general.lua")
+sup:getProperty("state_machine"):set(etasl_application_dir.."/scripts/rfsm/fsm_general2.lua")
 sup:addPeer(depl)
 -- depl:setActivity("Supervisor", 1/freq, 50, rtt.globals.ORO_SCHED_RT) --needed to use the time events of rfsm
 sup:configure()

@@ -1,0 +1,171 @@
+0.000 [ Info   ][Logger] No ORO_LOGLEVEL environment variable set.
+0.000 [ Info   ][Logger]  OROCOS version '2.9.2' compiled with GCC 5.4.0. Running in GNU/Linux.
+0.000 [ Info   ][Logger] Orocos Logging Activated at level : [ Warning] ( 4 ) 
+0.000 [ Info   ][Logger] Reference System Time is : 1610436765942117058 ticks ( 1.61044e+09 seconds ).
+0.000 [ Info   ][Logger] Logging is relative to this time.
+0.000 [ Info   ][Logger] RTT_COMPONENT_PATH was set to: /opt/ros/kinetic/lib/orocos:/media/ruixuan/Volume/ruixuan/Documents/etasl/ws/my_new_workspace/devel/lib/orocos:/media/ruixuan/Volume/ruixuan/Documents/etasl/ws/etasl-rtt/devel/lib/orocos . Searching in: /opt/ros/kinetic/lib/orocos:/media/ruixuan/Volume/ruixuan/Documents/etasl/ws/my_new_workspace/devel/lib/orocos:/media/ruixuan/Volume/ruixuan/Documents/etasl/ws/etasl-rtt/devel/lib/orocos
+0.000 [ Info   ][Logger] plugin 'rtt' not loaded before.
+0.000 [ Info   ][Logger] Loading plugin libraries from directory /opt/ros/kinetic/lib/orocos/gnulinux/./plugins ...
+0.000 [ Info   ][Logger] Loaded RTT Service 'marshalling' from 'rtt-marshalling'
+0.000 [ Info   ][Logger] Loaded RTT Service 'scripting' from 'rtt-scripting'
+0.000 [ Info   ][Logger] typekit 'rtt' not loaded before.
+0.000 [ Info   ][Logger] Loading typekit libraries from directory /opt/ros/kinetic/lib/orocos/gnulinux/./types ...
+0.006 [ Info   ][TypekitRepository::Import] Loading Transport CORBA://rtt-types.
+0.006 [ Info   ][Logger] Loaded RTT TypeKit/Transport 'rtt-corba-types' from 'rtt-transport-corba'
+0.006 [ Info   ][TypekitRepository::Import] Loading Transport mqueue://rtt-types.
+0.006 [ Info   ][Logger] Loaded RTT TypeKit/Transport 'rtt-mqueue-transport' from 'rtt-transport-mqueue'
+0.016 [ Info   ][TypekitRepository::Import] Loading Typekit rtt-types.
+0.016 [ Info   ][TypekitRepository::Import] Registered new 'CORBA' transport for int
+0.016 [ Info   ][TypekitRepository::Import] Registered new 'mqueue' transport for int
+0.016 [ Info   ][TypekitRepository::Import] Registered new 'CORBA' transport for uint
+0.016 [ Info   ][TypekitRepository::Import] Registered new 'mqueue' transport for uint
+0.016 [ Info   ][TypekitRepository::Import] Registered new 'CORBA' transport for llong
+0.016 [ Info   ][TypekitRepository::Import] Registered new 'mqueue' transport for llong
+0.016 [ Info   ][TypekitRepository::Import] Registered new 'CORBA' transport for ullong
+0.016 [ Info   ][TypekitRepository::Import] Registered new 'mqueue' transport for ullong
+0.016 [ Info   ][TypekitRepository::Import] Registered new 'CORBA' transport for double
+0.016 [ Info   ][TypekitRepository::Import] Registered new 'mqueue' transport for double
+0.016 [ Info   ][TypekitRepository::Import] Registered new 'CORBA' transport for float
+0.016 [ Info   ][TypekitRepository::Import] Registered new 'mqueue' transport for float
+0.016 [ Info   ][TypekitRepository::Import] Registered new 'CORBA' transport for char
+0.016 [ Info   ][TypekitRepository::Import] Registered new 'mqueue' transport for char
+0.016 [ Info   ][TypekitRepository::Import] Registered new 'CORBA' transport for bool
+0.016 [ Info   ][TypekitRepository::Import] Registered new 'mqueue' transport for bool
+0.016 [ Info   ][TypekitRepository::Import] Registered new 'CORBA' transport for void
+0.017 [ Info   ][TypekitRepository::Import] Registered new 'CORBA' transport for ConnPolicy
+0.017 [ Info   ][TypekitRepository::Import] Registered new 'CORBA' transport for TaskContext
+0.017 [ Info   ][TypekitRepository::Import] Registered new 'CORBA' transport for string
+0.017 [ Info   ][TypekitRepository::Import] Registered new 'CORBA' transport for array
+0.017 [ Info   ][TypekitRepository::Import] Registered new 'mqueue' transport for array
+0.017 [ Info   ][TypekitRepository::Import] Registered new 'CORBA' transport for rt_string
+0.017 [ Info   ][Logger] Loaded RTT TypeKit/Transport 'rtt-types' from 'rtt-typekit'
+0.017 [ Info   ][Logger] RTT_COMPONENT_PATH was set to: /opt/ros/kinetic/lib/orocos:/media/ruixuan/Volume/ruixuan/Documents/etasl/ws/my_new_workspace/devel/lib/orocos:/media/ruixuan/Volume/ruixuan/Documents/etasl/ws/etasl-rtt/devel/lib/orocos . Searching in: /opt/ros/kinetic/lib/orocos:/media/ruixuan/Volume/ruixuan/Documents/etasl/ws/my_new_workspace/devel/lib/orocos:/media/ruixuan/Volume/ruixuan/Documents/etasl/ws/etasl-rtt/devel/lib/orocos
+0.017 [ Info   ][Logger] OCL factory set for real-time logging
+0.017 [ Info   ][Thread] Creating Thread for scheduler=ORO_SCHED_OTHER, priority=1, CPU affinity=0, with name='Deployer'
+0.017 [ Info   ][Deployer] Thread created with scheduler type 'ORO_SCHED_OTHER', priority 0, cpu affinity 4095 and period 0 (PID= 27610 ).
+0.017 [ Info   ][Logger] No site file was found. Importing 'ocl' by default.
+0.017 [ Info   ][ComponentLoader::import(path_list)] Importing directory /opt/ros/kinetic/lib/orocos/gnulinux/ocl ...
+0.018 [ Info   ][ComponentLoader::import(path_list)] Loaded component type 'OCL::LuaTLSFComponent'
+0.025 [ Info   ][ComponentLoader::import(path_list)] Loaded multi component library '/opt/ros/kinetic/lib/orocos/gnulinux/ocl/liborocos-ocl-reporting-netcdf-gnulinux.so'
+0.025 [ Info   ][ComponentLoader::import(path_list)] Loaded component type 'OCL::NetcdfReporting'
+0.026 [ Info   ][ComponentLoader::import(path_list)] Loaded multi component library '/opt/ros/kinetic/lib/orocos/gnulinux/ocl/liborocos-ocl-common-gnulinux.so'
+0.026 [ Info   ][ComponentLoader::import(path_list)] Loaded multi component library '/opt/ros/kinetic/lib/orocos/gnulinux/ocl/liborocos-ocl-logging-gnulinux.so'
+0.027 [ Info   ][ComponentLoader::import(path_list)] Loaded component type 'OCL::HelloWorld'
+0.027 [ Info   ][ComponentLoader::import(path_list)] Loaded multi component library '/opt/ros/kinetic/lib/orocos/gnulinux/ocl/liborocos-ocl-reporting-gnulinux.so'
+0.028 [ Info   ][ComponentLoader::import(path_list)] Loaded component type 'OCL::LuaComponent'
+0.029 [ Info   ][ComponentLoader::import(path_list)] Loaded multi component library '/opt/ros/kinetic/lib/orocos/gnulinux/ocl/liborocos-ocl-timer-gnulinux.so'
+0.029 [ Info   ][ComponentLoader::import(path_list)] Loading typekit libraries from directory /opt/ros/kinetic/lib/orocos/gnulinux/ocl/types ...
+0.030 [ Info   ][TypekitRepository::Import] Loading Typekit OCLTypekit.
+0.030 [ Info   ][ComponentLoader::import(path_list)] Loaded RTT TypeKit/Transport 'OCLTypekit' from 'ocl'
+0.030 [ Info   ][ComponentLoader::import(path_list)] Loading plugin libraries from directory /opt/ros/kinetic/lib/orocos/gnulinux/ocl/plugins ...
+0.031 [ Info   ][ComponentLoader::import(path_list)] Loaded RTT Service 'Lua' from 'rttlua-plugin'
+0.031 [ Info   ][ComponentLoader::import(path_list)] Loaded RTT Service 'os' from 'os'
+0.032 [ Info   ][ComponentLoader::import(path_list)] Loaded RTT Service 'LuaTLSF' from 'rttlua-tlsf-plugin'
+0.032 [ Info   ][ComponentLoader::import(path_list)] Loaded RTT Service 'print' from 'print'
+0.032 [ Info   ][Logger] Loading Service or Plugin scripting in TaskContext Deployer
+0.032 [ Info   ][Logger] Found complete interface of requested service 'scripting'
+0.033 [ Info   ][Logger] Running Script test.ops ...
+0.033 [ Info   ][Thread] Creating Thread for scheduler=ORO_SCHED_OTHER, priority=1, CPU affinity=0, with name='GlobalEngine'
+0.033 [ Info   ][GlobalEngine] Thread created with scheduler type 'ORO_SCHED_OTHER', priority 0, cpu affinity 4095 and period 0 (PID= 27611 ).
+0.033 [ Info   ][ComponentLoader::import(path_list)] Importing directory /media/ruixuan/Volume/ruixuan/Documents/etasl/ws/my_new_workspace/devel/lib/orocos/gnulinux/soem_master ...
+0.034 [ Info   ][ComponentLoader::import(path_list)] Loaded component type 'soem_master::SoemMasterComponent'
+0.034 [ Info   ][ComponentLoader::import(path_list)] Loading plugin libraries from directory /media/ruixuan/Volume/ruixuan/Documents/etasl/ws/my_new_workspace/devel/lib/orocos/gnulinux/soem_master/plugins ...
+0.034 [ Info   ][ComponentLoader::import(path_list)] Loaded RTT Plugin 'soem-plugin' from 'soem_plugin'
+0.034 [ Info   ][ComponentLoader::import(path_list)] Importing directory /media/ruixuan/Volume/ruixuan/Documents/etasl/ws/my_new_workspace/devel/lib/orocos/gnulinux/soem_beckhoff_drivers ...
+0.034 [ Info   ][ComponentLoader::import(path_list)] Loading typekit libraries from directory /media/ruixuan/Volume/ruixuan/Documents/etasl/ws/my_new_workspace/devel/lib/orocos/gnulinux/soem_beckhoff_drivers/types ...
+0.052 [ Info   ][TypekitRepository::Import] Loading Typekit ros-soem_beckhoff_drivers.
+0.053 [ Info   ][ComponentLoader::import(path_list)] Loaded RTT TypeKit/Transport 'ros-soem_beckhoff_drivers' from 'rtt-soem_beckhoff_drivers-typekit'
+0.062 [ Info   ][TypekitRepository::Import] Loading Transport ros://ros-soem_beckhoff_drivers.
+0.062 [ Info   ][TypekitRepository::Import] Registered new 'ros' transport for /soem_beckhoff_drivers/AnalogMsg
+0.062 [ Info   ][TypekitRepository::Import] Registered new 'ros' transport for /soem_beckhoff_drivers/CommMsg
+0.062 [ Info   ][TypekitRepository::Import] Registered new 'ros' transport for /soem_beckhoff_drivers/CommMsgBig
+0.062 [ Info   ][TypekitRepository::Import] Registered new 'ros' transport for /soem_beckhoff_drivers/DigitalMsg
+0.062 [ Info   ][TypekitRepository::Import] Registered new 'ros' transport for /soem_beckhoff_drivers/EncoderInMsg
+0.062 [ Info   ][TypekitRepository::Import] Registered new 'ros' transport for /soem_beckhoff_drivers/EncoderMsg
+0.062 [ Info   ][TypekitRepository::Import] Registered new 'ros' transport for /soem_beckhoff_drivers/EncoderOutMsg
+0.062 [ Info   ][TypekitRepository::Import] Registered new 'ros' transport for /soem_beckhoff_drivers/PSUMsg
+0.062 [ Info   ][ComponentLoader::import(path_list)] Loaded RTT TypeKit/Transport 'rtt-ros-soem_beckhoff_drivers-transport' from 'rtt-soem_beckhoff_drivers-ros-transport'
+0.062 [ Info   ][ComponentLoader::import(path_list)] Loading plugin libraries from directory /media/ruixuan/Volume/ruixuan/Documents/etasl/ws/my_new_workspace/devel/lib/orocos/gnulinux/soem_beckhoff_drivers/plugins ...
+0.067 [ Info   ][SoemDriverFactor] Registering driver for EL6022
+0.067 [ Info   ][ComponentLoader::import(path_list)] Loaded RTT Plugin 'libsoem_el6022-gnulinux.so' from 'soem_el6022'
+0.072 [ Info   ][SoemDriverFactor] Registering driver for EL3104
+0.072 [ Info   ][ComponentLoader::import(path_list)] Loaded RTT Plugin 'libsoem_el3104-gnulinux.so' from 'soem_el3104'
+0.076 [ Info   ][SoemDriverFactor] Registering driver for EL5101
+0.076 [ Info   ][ComponentLoader::import(path_list)] Loaded RTT Plugin 'libsoem_el5101-gnulinux.so' from 'soem_el5101'
+0.080 [ Info   ][SoemDriverFactor] Registering driver for EL1124
+0.080 [ Info   ][SoemDriverFactor] Registering driver for EL1144
+0.080 [ Info   ][SoemDriverFactor] Registering driver for EL1004
+0.080 [ Info   ][SoemDriverFactor] Registering driver for EL1008
+0.080 [ Info   ][SoemDriverFactor] Registering driver for EL1098
+0.080 [ Info   ][ComponentLoader::import(path_list)] Loaded RTT Plugin 'libsoem_el1xxx-gnulinux.so' from 'soem_el1xxx'
+0.086 [ Info   ][SoemDriverFactor] Registering driver for EL3052
+0.086 [ Info   ][SoemDriverFactor] Registering driver for EL3062
+0.086 [ Info   ][SoemDriverFactor] Registering driver for EL3004
+0.087 [ Info   ][SoemDriverFactor] Registering driver for EL3008
+0.087 [ Info   ][ComponentLoader::import(path_list)] Loaded RTT Plugin 'libsoem_el30xx-gnulinux.so' from 'soem_el30xx'
+0.093 [ Info   ][SoemDriverFactor] Registering driver for EL4002
+0.093 [ Info   ][SoemDriverFactor] Registering driver for EL4004
+0.093 [ Info   ][SoemDriverFactor] Registering driver for EL4008
+0.093 [ Info   ][SoemDriverFactor] Registering driver for EL4022
+0.093 [ Info   ][SoemDriverFactor] Registering driver for EL4032
+0.093 [ Info   ][SoemDriverFactor] Registering driver for EL4034
+0.093 [ Info   ][SoemDriverFactor] Registering driver for EL4038
+0.093 [ Info   ][SoemDriverFactor] Registering driver for EL4134
+0.093 [ Info   ][ComponentLoader::import(path_list)] Loaded RTT Plugin 'libsoem_el4xxx-gnulinux.so' from 'soem_el4xxx'
+0.098 [ Info   ][SoemDriverFactor] Registering driver for EL2002
+0.098 [ Info   ][SoemDriverFactor] Registering driver for EL2004
+0.098 [ Info   ][SoemDriverFactor] Registering driver for EL2008
+0.098 [ Info   ][SoemDriverFactor] Registering driver for EL2034
+0.098 [ Info   ][SoemDriverFactor] Registering driver for EL2124
+0.098 [ Info   ][SoemDriverFactor] Registering driver for EL2612
+0.098 [ Info   ][SoemDriverFactor] Registering driver for EL2624
+0.098 [ Info   ][ComponentLoader::import(path_list)] Loaded RTT Plugin 'libsoem_el2xxx-gnulinux.so' from 'soem_el2xxx'
+0.103 [ Info   ][SoemDriverFactor] Registering driver for EL3102
+0.103 [ Info   ][ComponentLoader::import(path_list)] Loaded RTT Plugin 'libsoem_el3102-gnulinux.so' from 'soem_el3102'
+0.103 [ Info   ][Thread] Creating Thread for scheduler=ORO_SCHED_OTHER, priority=1, CPU affinity=0, with name='Master'
+0.103 [ Info   ][Master] Thread created with scheduler type 'ORO_SCHED_OTHER', priority 0, cpu affinity 4095 and period 0 (PID= 27612 ).
+0.103 [ Info   ][loadComponent] Adding Master as new peer:  OK.
+0.116 [ Info   ][Master] ec_init on eth0 succeeded.
+0.164 [ ERROR  ][Master] Configuration of slaves failed!!!
+0.164 [ Info   ][SoemDriverFactory] Following SOEM drivers are registered: 
+
+0.164 [ Info   ][SoemDriverFactory] 	EL1004
+0.164 [ Info   ][SoemDriverFactory] 	EL1008
+0.164 [ Info   ][SoemDriverFactory] 	EL1098
+0.164 [ Info   ][SoemDriverFactory] 	EL1124
+0.164 [ Info   ][SoemDriverFactory] 	EL1144
+0.164 [ Info   ][SoemDriverFactory] 	EL2002
+0.164 [ Info   ][SoemDriverFactory] 	EL2004
+0.164 [ Info   ][SoemDriverFactory] 	EL2008
+0.164 [ Info   ][SoemDriverFactory] 	EL2034
+0.164 [ Info   ][SoemDriverFactory] 	EL2124
+0.164 [ Info   ][SoemDriverFactory] 	EL2612
+0.164 [ Info   ][SoemDriverFactory] 	EL2624
+0.164 [ Info   ][SoemDriverFactory] 	EL3004
+0.164 [ Info   ][SoemDriverFactory] 	EL3008
+0.164 [ Info   ][SoemDriverFactory] 	EL3052
+0.164 [ Info   ][SoemDriverFactory] 	EL3062
+0.164 [ Info   ][SoemDriverFactory] 	EL3102
+0.164 [ Info   ][SoemDriverFactory] 	EL3104
+0.164 [ Info   ][SoemDriverFactory] 	EL4002
+0.164 [ Info   ][SoemDriverFactory] 	EL4004
+0.164 [ Info   ][SoemDriverFactory] 	EL4008
+0.164 [ Info   ][SoemDriverFactory] 	EL4022
+0.164 [ Info   ][SoemDriverFactory] 	EL4032
+0.164 [ Info   ][SoemDriverFactory] 	EL4034
+0.164 [ Info   ][SoemDriverFactory] 	EL4038
+0.164 [ Info   ][SoemDriverFactory] 	EL4134
+0.164 [ Info   ][SoemDriverFactory] 	EL5101
+0.164 [ Info   ][SoemDriverFactory] 	EL6022
+0.164 [ Info   ][Thread] Creating Thread for scheduler=ORO_SCHED_OTHER, priority=1, CPU affinity=0, with name='TaskBrowser'
+0.165 [ Info   ][TaskBrowser] Thread created with scheduler type 'ORO_SCHED_OTHER', priority 0, cpu affinity 4095 and period 0 (PID= 27613 ).
+0.165 [ Info   ][Logger] Entering Task Deployer
+6.050 [ Info   ][Logger] Ignoring deployment shutdown function due to missing peer.
+6.050 [ Info   ][stopComponentsGroup] Stopping group 0
+6.050 [ Info   ][stopComponentsGroup] Stopped Master
+6.050 [ Info   ][cleanupComponentsGroup] Cleaning up group 0
+6.050 [ Info   ][cleanupComponentsGroup] Cleaned up Master
+6.050 [ Info   ][Logger] Unloading group 0
+6.050 [ Info   ][Logger] Disconnected and destroyed Master
+6.050 [ Info   ][Logger] Kick-out of group 0 successful.
+6.052 [ Info   ][Logger] Orocos Logging Deactivated.
