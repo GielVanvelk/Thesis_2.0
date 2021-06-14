@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "cpf.dtd">
+<properties>
+	<simple name="udp_port" type="long"><description>udp port of the LWR robot, e.g. 49959</description><value>49959</value></simple>
+	<simple name="LWR_ctrl_mode" type="string"><description>control mode of the LWR robot: JointPosition, CartesianImpedance, or JointImpedance</description><value>JointPosition</value></simple>
+	<simple name="robot_number" type="long"><description>The number of the robot</description><value>1</value></simple>
+	<simple name="kx" type="double"><description>stiffness of the contour (or in this case, robot) in the x-axis direction [N/m]</description><value>200</value></simple>
+	<simple name="ky" type="double"><description>stiffness of the contour (or in this case, robot) in the y-axis direction [N/m]</description><value>200</value></simple>
+	<simple name="deadzone_fx" type="double"><description>force deadzone of the force sensor on the x-axis [N]</description><value>1</value></simple>
+	<simple name="deadzone_fy" type="double"><description>force deadzone of the force sensor on the y-axis [N]</description><value>1</value></simple>
+    <simple name="filter_coeff" type="double"><description>the coefficient of the low pass filter for input velocity joint commands</description><value>0.01</value></simple>
+    <simple name="dq_threshold" type="double"><description>the maximum joint velocity command difference between two sample times</description><value>0.01</value></simple>
+	
+<!-- 	Optimistic joint limit (extra precaution is needed) -->
+<!--  <struct name="joint_vel_saturation_limit" type="array">
+     <description>Saturation limit</description>
+     <simple name="Limit0" type="double"><description>Saturation Limit</description><value>0.15</value></simple>
+     <simple name="Limit1" type="double"><description>Saturation Limit</description><value>0.15</value></simple>
+     <simple name="Limit2" type="double"><description>Saturation Limit</description><value>0.2</value></simple>
+     <simple name="Limit3" type="double"><description>Saturation Limit</description><value>0.2</value></simple>
+     <simple name="Limit4" type="double"><description>Saturation Limit</description><value>0.2</value></simple>
+     <simple name="Limit5" type="double"><description>Saturation Limit</description><value>0.2</value></simple>
+     <simple name="Limit6" type="double"><description>Saturation Limit</description><value>0.6</value></simple>     
+  </struct>-->
+	
+	
+  <struct name="joint_vel_saturation_limit" type="array">
+     <description>Saturation limit</description>
+     <simple name="Limit0" type="double"><description>Saturation Limit</description><value>0.1</value></simple>
+     <simple name="Limit1" type="double"><description>Saturation Limit</description><value>0.1</value></simple>
+     <simple name="Limit2" type="double"><description>Saturation Limit</description><value>0.1</value></simple>
+     <simple name="Limit3" type="double"><description>Saturation Limit</description><value>0.1</value></simple>
+     <simple name="Limit4" type="double"><description>Saturation Limit</description><value>0.1</value></simple>
+     <simple name="Limit5" type="double"><description>Saturation Limit</description><value>0.1</value></simple>
+     <simple name="Limit6" type="double"><description>Saturation Limit</description><value>0.3</value></simple>     
+  </struct>	
+  
+  <struct name="Home_position" type="array">
+     <description>Home pos</description>
+     <simple name="Element0" type="double"><description>Sequence Element</description><value>-2.91957</value></simple>
+     <simple name="Element1" type="double"><description>Sequence Element</description><value>-0.292685</value></simple>
+     <simple name="Element2" type="double"><description>Sequence Element</description><value>2.91472</value></simple>
+     <simple name="Element3" type="double"><description>Sequence Element</description><value>-1.89328</value></simple>
+     <simple name="Element4" type="double"><description>Sequence Element</description><value>0.356014</value></simple>
+     <simple name="Element5" type="double"><description>Sequence Element</description><value>1.17812</value></simple>
+     <simple name="Element6" type="double"><description>Sequence Element</description><value>2.89118</value></simple>     
+  </struct>
+  <simple name="lwr_joint_pos_gains" type="string"><description>LWR_Gains_NOT_modifiable_on_KRC</description><value></value></simple>
+  <struct name="lwr_joint_imp_gains" type="/lwr_fri_msgs/FriJointImpedance">
+     <description>LWR_Joint_Imp_gains</description>
+     <struct name="stiffness" type="float32">
+        <description>Part</description>
+        <simple name="Element0" type="float"><description>Sequence Element</description><value>100</value></simple>
+        <simple name="Element1" type="float"><description>Sequence Element</description><value>100</value></simple>
+        <simple name="Element2" type="float"><description>Sequence Element</description><value>100</value></simple>
+        <simple name="Element3" type="float"><description>Sequence Element</description><value>100</value></simple>
+        <simple name="Element4" type="float"><description>Sequence Element</description><value>100</value></simple>
+        <simple name="Element5" type="float"><description>Sequence Element</description><value>100</value></simple>
+        <simple name="Element6" type="float"><description>Sequence Element</description><value>100</value></simple>
+     </struct>
+     <struct name="damping" type="float32">
+        <description>Part</description>
+        <simple name="Element0" type="float"><description>Sequence Element</description><value>0.3</value></simple>
+        <simple name="Element1" type="float"><description>Sequence Element</description><value>0.3</value></simple>
+        <simple name="Element2" type="float"><description>Sequence Element</description><value>0.3</value></simple>
+        <simple name="Element3" type="float"><description>Sequence Element</description><value>0.3</value></simple>
+        <simple name="Element4" type="float"><description>Sequence Element</description><value>0.3</value></simple>
+        <simple name="Element5" type="float"><description>Sequence Element</description><value>0.3</value></simple>
+        <simple name="Element6" type="float"><description>Sequence Element</description><value>0.3</value></simple>
+     </struct>
+  </struct>
+ </properties>

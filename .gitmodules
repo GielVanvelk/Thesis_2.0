@@ -1,0 +1,3 @@
+[submodule "src/viz_marker"]
+	path = src/viz_marker
+	url = https://gitlab.kuleuven.be/rob-expressiongraphs/viz_marker.git

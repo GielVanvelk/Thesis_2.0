@@ -1,0 +1,15 @@
+<package>
+  <description brief="kuka_lwr_description">
+
+     Fork of KUKA LWR model/urdf description
+     from rosie_description (TUM), for internal use at KU Leuven
+
+  </description>
+  <author>Enea Scioni</author>
+  <license>LGPL/BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/kuka_lwr_description</url>
+
+</package>
+
+

@@ -1,0 +1,39 @@
+<?xml version="1.0"?> 
+<robot  xmlns:xacro="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+      name="LWR"> 
+ 
+  <xacro:include filename="$(find kuka_lwr_description)/urdf/kuka_lwr_arm.urdf.xacro"/> 
+  <xacro:include filename="$(find kuka_lwr_description)/urdf/common/materials.xml"/> 
+ 
+  <link name="base_link" /> 
+    <link name="base_glass" /> 
+ 
+     <kuka_lwr_arm parent="base_link" name="arm" right="1" tool_name="_angle"> 
+    <origin xyz="0.9 0 0" 
+            rpy="0 0 0"/> 
+  </kuka_lwr_arm> 
+  
+  <joint name="glass_fixed_link" type="fixed">
+  <origin xyz="0 0 0.25" rpy="0  -1.57 0"/>
+    <parent link="base_link"/>
+    <child link="base_glass"/>
+    </joint>
+ 
+  <xacro:include filename="$(find kuka_lwr_description)/urdf/tool.xacro" />
+  <xacro:cylinder_tool parent="base_glass" name="glass" rgba="1.0 0.487 0 1.0"/>
+  
+  <!--
+  <include filename="$(find kuka_lwr_description)/urdf/common/util_defs.xml"/> 
+  <include filename="$(find kuka_lwr_description)/urdf/common/materials.xml"/> 
+  -->
+  <xacro:include filename="$(find kuka_lwr_description)/urdf/sdh/sdh.urdf.xacro"/> 
+  <xacro:include filename="$(find kuka_lwr_description)/urdf/common/schunk_materials.urdf.xacro"/> 
+  
+  <xacro:schunk_sdh parent="arm_arm_hand_link" name="hand"> 
+  <pose xyz="0 0 0" rpy="0 0 0" />
+   </xacro:schunk_sdh>
+   
+    <xacro:include filename="$(find kuka_lwr_description)/urdf/additional_schunk_hand_frames.xacro" />
+     <xacro:additional_schunk_hand_frames name="hand"/> 
+   
+  </robot>

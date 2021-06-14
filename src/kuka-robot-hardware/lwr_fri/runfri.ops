@@ -1,0 +1,16 @@
+import("rtt_roscomm")
+import("rtt_ros")
+ros.import("lwr_fri")
+ros.import("kuka_lwr_fri")
+ros.import("rtt_lwr_fri_msgs")
+ros.import("rtt_motion_control_msgs")
+ros.import("rtt_geometry_msgs")
+ros.import("rtt_sensor_msgs")
+ros.import("kdl_typekit")
+
+loadComponent("lwr","lwr_fri::FRIComponent")
+setActivity("lwr",0, 99, ORO_SCHED_RT)
+lwr.udp_port=49958
+lwr.configure
+lwr.start
+

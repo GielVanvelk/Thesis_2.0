@@ -1,0 +1,4 @@
+[rosrun] Couldn't find executable named xacro below /opt/ros/indigo/share/xacro
+[rosrun] Found the following, but they're either not files,
+[rosrun] or not executable:
+[rosrun]   /opt/ros/indigo/share/xacro

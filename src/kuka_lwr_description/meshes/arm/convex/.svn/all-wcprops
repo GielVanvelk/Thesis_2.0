@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/p/tum-ros-pkg/code/!svn/ver/943/robot_model/rosie_description/meshes/arm/convex
+END
+arm_wrist_convex.stl
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/p/tum-ros-pkg/code/!svn/ver/943/robot_model/rosie_description/meshes/arm/convex/arm_wrist_convex.stl
+END
+arm_base_convex.stl
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/p/tum-ros-pkg/code/!svn/ver/943/robot_model/rosie_description/meshes/arm/convex/arm_base_convex.stl
+END
+README
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/p/tum-ros-pkg/code/!svn/ver/943/robot_model/rosie_description/meshes/arm/convex/README
+END
+arm_flanche_convex.stl
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/p/tum-ros-pkg/code/!svn/ver/943/robot_model/rosie_description/meshes/arm/convex/arm_flanche_convex.stl
+END
+arm_segment_a_convex.stl
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/p/tum-ros-pkg/code/!svn/ver/943/robot_model/rosie_description/meshes/arm/convex/arm_segment_a_convex.stl
+END
+arm_segment_b_convex.stl
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/p/tum-ros-pkg/code/!svn/ver/943/robot_model/rosie_description/meshes/arm/convex/arm_segment_b_convex.stl
+END
+arm_segment_last_convex.stl
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/p/tum-ros-pkg/code/!svn/ver/943/robot_model/rosie_description/meshes/arm/convex/arm_segment_last_convex.stl
+END
+arm_flanche_angle_convex.stl
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/p/tum-ros-pkg/code/!svn/ver/943/robot_model/rosie_description/meshes/arm/convex/arm_flanche_angle_convex.stl
+END

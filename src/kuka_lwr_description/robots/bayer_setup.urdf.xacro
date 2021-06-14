@@ -1,0 +1,141 @@
+<?xml version="1.0"?> 
+<robot name="LWR" xmlns:xacro="http://www.ros.org/wiki/xacro">
+ 
+  
+  <xacro:include filename="$(find kuka_lwr_description)/urdf/kuka_lwr_arm.urdf.xacro"/> 
+  <xacro:include filename="$(find kuka_lwr_description)/urdf/common/materials.xml"/> 
+  <xacro:include filename="$(find kuka_lwr_description)/urdf/common/util_defs.xml"/>
+  
+<!--   <property name="alpha" value="{M_PI/2}"/> -->
+<!--   <property name="R" value="0.5"/> -->
+  <property name="hight" value="0.6"/>
+  <property name="radial" value="-0.7"/>
+  <property name="tangential" value="0"/>
+
+  
+  <link name="world" /> 
+  
+<!-- Robots   -->
+  
+<!--   lwr 1 -->
+  <kuka_lwr_arm parent="world" name="lwr_1" right="1" tool_name=""> 
+    <origin xyz="${radial} ${tangential} ${hight}" 
+            rpy="0 0 0"/> 
+  </kuka_lwr_arm> 
+
+<!--   rope -->
+  <joint name="rope" type="fixed">
+    <parent link="lwr_1_arm_link_7"/>
+    <child link="rope"/>
+    <origin xyz="0 -.0325 .1875" 
+            rpy="0 0 0"/>
+  </joint>  
+  
+  <link name="rope"/>
+
+<!--   cal_point_1 -->
+  <joint name="cal_point_1" type="fixed">
+    <parent link="lwr_1_arm_link_7"/>
+    <child link="cal_point_1"/>
+    <origin xyz="0 0 .234" 
+            rpy="0 0 0"/>
+  </joint>  
+  
+  <link name="cal_point_1"/>  
+  
+  
+<!--   lwr 2 -->
+    <kuka_lwr_arm parent="world" name="lwr_2" right="1" tool_name=""> 
+    <origin xyz="${tangential} ${radial} ${hight}" 
+            rpy="0 0 ${M_PI/2}"/> 
+  </kuka_lwr_arm> 
+  
+<!--   cal_point_2 -->
+  <joint name="cal_point_2" type="fixed">
+    <parent link="lwr_2_arm_link_7"/>
+    <child link="cal_point_2"/>
+    <origin xyz="0 0 .234" 
+            rpy="0 0 0"/>
+  </joint>  
+  
+  <link name="cal_point_2"/>  
+  
+  
+<!--  Stands  -->
+  
+  <joint name="stand_1" type="fixed">
+    <parent link="world"/>
+    <child link="stand_1"/>
+    <origin xyz="${radial} ${tangential} ${hight}" 
+            rpy="0 0 0"/>
+  </joint>
+  
+  <link name="stand_1">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 ${-hight/2}"/>
+      <geometry>
+          <box size=".2 .2 ${hight}"/>
+      </geometry>
+	<material name="DarkGrey"/>
+    </visual>
+  </link>
+  
+  <joint name="stand_2" type="fixed">
+    <parent link="world"/>
+    <child link="stand_2"/>
+    <origin xyz="${tangential} ${radial} ${hight}" 
+            rpy="0 0 ${M_PI/2}"/> 
+  </joint>
+  
+  <link name="stand_2">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 ${-hight/2}"/>
+      <geometry>
+          <box size=".2 .2 ${hight}"/>
+      </geometry>
+	<material name="DarkGrey"/>
+    </visual>
+  </link>  
+
+<!-- Drums   -->
+
+  <joint name="drum" type="fixed">
+    <parent link="world"/>
+    <child link="drum"/>
+    <origin xyz="0 0 0"/>
+  </joint>
+  
+  
+  <link name="drum">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+          <mesh filename="package://kuka_lwr_description/meshes/bayer/large_drum.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+	<material name="Wheat"/>
+    </visual>
+  </link>
+  
+  
+
+  <joint name="lid" type="fixed">
+    <parent link="drum"/>
+    <child link="lid"/>
+    <origin xyz="0 0 0.8"/>
+  </joint>
+  
+<!--   TODO @Cristian check the hight of the lid in the CAD -->
+
+  <link name="lid">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.01"/>
+      <geometry>
+          <mesh filename="package://kuka_lwr_description/meshes/bayer/large_drum_lid.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+	<material name="Silver"/>
+    </visual>
+  </link>  
+  
+  
+  
+</robot>

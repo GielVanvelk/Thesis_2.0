@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<robot xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+       xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+       xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface">
+
+  <property name="tool_length" value="0.3"/>
+
+
+  <macro name="cylinder_tool" params="parent name rgba">
+      <joint name="${name}_joint" type="fixed">
+        <origin rpy="0 0 0" xyz="${tool_length/2.0} 0 0"/>
+        <parent link="${parent}"/>
+        <child link="${name}_link"/>
+      </joint>
+      <link name="${name}_link">
+          <visual>
+            <origin xyz="0 0 0" rpy="0 1.5708 0 " />
+            <geometry>
+              <cylinder length="${tool_length}" radius="0.03"/>
+            </geometry>
+            <material name="a">
+                <color rgba="${rgba}"/>
+            </material>
+          </visual>
+      </link>
+  </macro>
+
+</robot>
+
