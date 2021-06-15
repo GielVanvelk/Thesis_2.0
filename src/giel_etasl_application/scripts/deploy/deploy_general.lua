@@ -8,6 +8,8 @@ require "rttlib"
 require "rttros"
 require "deployer_utils"
 
+--require "rtt_ros"
+
 -- ====================================== User Parameters =========================================
 
 --robot_name: Choose the robot model: "ur_10" or "kinova_gen3" are currently supported
@@ -149,10 +151,16 @@ if not simulation and use_jr3 then
 end
 
 -- ====================================== Giel Component
-depl:import("giel_component")
-depl:loadComponent("GielComponent","gcomp::GielComponent")
-gcomp_gui= depl:getPeer("GielComponent")
+depl:import("giel_component") --folder name
+depl:loadComponent("GielComponent","gcomp::GielComponent") --import component
+
+gcomp_gui = depl:getPeer("GielComponent")
 depl:setActivity(gcomp_gui:getName(), 1/freq, 50, rtt.globals.ORO_SCHED_RT)
+
+--stream("gcomp_gui.in_force_data", ros.comm.topic("chatter")) --connect component input with ros topic
+
+--depl:connect(gcomp_gui:getName( )..".out_W_ati","etaslcore.force_sensor",cp ) -- to connect multimple components
+depl:stream( gcomp_gui:getName( )..".in_force_data" , rtt.provides( "ros" ):topic("chatter") )
 
 gcomp_gui:configure()
 gcomp_gui:start()

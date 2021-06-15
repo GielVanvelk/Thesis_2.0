@@ -6,6 +6,11 @@
 #include <string>
 #include <Eigen/Geometry>
 
+
+#include <rtt/Component.hpp>
+#include <std_msgs/Bool.h>
+#include <std_msgs/Int64.h>
+
 namespace gcomp
 {
 
@@ -25,7 +30,8 @@ class GielComponent : public RTT::TaskContext
         // Properties
 
         // INPUT-Ports
-        RTT::InputPort < std::vector < double > >       in_force_data_;
+        //RTT::InputPort < std::vector < double > >       in_force_data_;
+        RTT::InputPort < int >                        in_force_data_;
 
         // OUTPUT-Ports
         RTT::OutputPort < bool >                        out_force_too_low_;
@@ -33,7 +39,8 @@ class GielComponent : public RTT::TaskContext
 
     private:
         // Messages
-        std::vector < double >      msg_force_data_;
+        // std::vector < double >      msg_force_data_;
+        int       msg_force_data_;
         bool      msg_force_too_high_ ;
         bool      msg_force_too_low_ ;
 };

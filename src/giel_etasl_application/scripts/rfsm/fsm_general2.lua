@@ -23,6 +23,7 @@ depl        = tc:getPeer("Deployer")
 etaslcore   = depl:getPeer("etaslcore")
 reporter    = depl:getPeer("Reporter")
 solver      = depl:getPeer("solver")
+gcomp_gui   = depl:getPeer("GielComponent")
 
 depl:import("rtt_ros")
 ros = gs:provides("ros")
@@ -167,11 +168,14 @@ return rfsm.state {
   move_straight_line = rfsm.state {
     entry=function()
 
-      F2H = gcomp_gui:getPort("out_force_too_high")
+      F2H = rttlib.port_clone_conn(gcomp_gui:getPort("out_force_too_high"))
+
+      --F2H = gcomp_gui:getPort("out_force_too_high")
       local fs, data= F2H:read()
       local F2H= data
 
-      F2L = gcomp_gui:getPort("out_force_too_low")
+      F2L = rttlib.port_clone_conn(gcomp_gui:getPort("out_force_too_low"))
+      -- F2L = gcomp_gui:getPort("out_force_too_low")
       local fs, data= F2L:read()
       local F2L= data
 

@@ -7,6 +7,11 @@
 #include <cmath>
 #include <vector>
 
+#include <std_msgs/Bool.h>
+#include <std_msgs/Int64.h>
+
+
+
 using namespace RTT;
 using namespace Eigen;
 
@@ -16,9 +21,10 @@ namespace gcomp
     Constructor of the OROCOS component.
 */
 GielComponent::GielComponent( std::string const& _name ) : TaskContext( _name, PreOperational )
-    , msg_force_data_( 6, 0 )
     , msg_force_too_high_(false)
     , msg_force_too_low_(false)
+    , msg_force_data_(0)
+    //, msg_force_data_( 6, 0 )
 {
 
     // Add ports. (addEventPort() for a port that wakes up the activity)
@@ -89,9 +95,11 @@ void GielComponent::updateHook( )
 
     in_force_data_.read( msg_force_data_);
 
-    double fx = msg_force_data_ [0];
-    double fy = msg_force_data_ [1];
-    double fz = msg_force_data_ [2];
+    //double fx = msg_force_data_ [0];
+    //double fy = msg_force_data_ [1];
+    //double fz = msg_force_data_ [2];
+
+    double fx = msg_force_data_;
 
     if (fx >= 6.00) {
       msg_force_too_low_ = false;
