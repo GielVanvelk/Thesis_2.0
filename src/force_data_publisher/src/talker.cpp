@@ -3,20 +3,39 @@
 #include <sstream>
 #include <stdlib.h>
 
+#include "std_msgs/MultiArrayLayout.h"
+#include "std_msgs/MultiArrayDimension.h"
+
+#include "std_msgs/Float64MultiArray.h"
+#include <vector>
+
 
 
 int main(int argc, char **argv) {
 
 ros::init(argc, argv, "talker");
 ros::NodeHandle n;
-ros::Publisher chatter_pub = n.advertise<std_msgs::Int32>("chatter", 100);
-ros::Rate loop_rate(10);
+ros::Publisher chatter_pub = n.advertise<std_msgs::Float64MultiArray>("chatter", 1);
+ros::Rate loop_rate(1000);
 
   while(ros::ok()) {
 
-    std_msgs::Int32 msg;
-    msg.data = 10;
-    chatter_pub.publish(msg);
+    std_msgs::Float64MultiArray arr;
+
+    arr.data.clear();
+    //for loop, pushing data in the size of the array
+    for (int i = 0; i < 6; i++)
+    {
+        //assign array a random number between 0 and 255.
+        arr.data.push_back(10);
+    }
+
+		//Publish array
+		chatter_pub.publish(arr);
+
+    //std_msgs::Int32 msg;
+    //msg.data = 10;
+    //chatter_pub.publish(msg);
 
     ros::spinOnce();
 
