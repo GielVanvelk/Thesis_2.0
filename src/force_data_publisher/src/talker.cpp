@@ -26,16 +26,11 @@ ros::Rate loop_rate(1000);
     //for loop, pushing data in the size of the array
     for (int i = 0; i < 6; i++)
     {
-        //assign array a random number between 0 and 255.
         arr.data.push_back(10);
     }
 
 		//Publish array
 		chatter_pub.publish(arr);
-
-    //std_msgs::Int32 msg;
-    //msg.data = 10;
-    //chatter_pub.publish(msg);
 
     ros::spinOnce();
 

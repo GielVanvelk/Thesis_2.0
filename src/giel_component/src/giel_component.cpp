@@ -9,169 +9,190 @@
 #include <vector>
 
 #include <std_msgs/Bool.h>
+#include <geometry_msgs/Wrench.h>
+#include <geometry_msgs/Twist.h>
 #include <std_msgs/Int64.h>
+#include <std_msgs/Int32.h>
+#include <std_msgs/String.h>
 
+#include <iostream>
+#include <fstream>
+#include <ros/ros.h>
+#include <rosbag/bag.h>
+#include <rosbag/view.h>
 
+using namespace std;
 
 using namespace RTT;
 using namespace Eigen;
 
-namespace gcomp
-{
-/*
-    Constructor of the OROCOS component.
-*/
-GielComponent::GielComponent( std::string const& _name ) : TaskContext( _name, PreOperational )
-    , msg_force_too_high_(false)
-    , msg_force_too_low_(false)
-    , msg_force_data_( 6, 0 )
-    , msg_force_(0.0)
-    , msg_force_pre_(0.0)
-{
 
-    // Add ports. (addEventPort() for a port that wakes up the activity)
-    addPort("in_force_data", in_force_data_).doc( "The force data from the force sensor");
+namespace gcomp {
 
-    addPort("out_force_too_low", out_force_too_low_ ).doc( "Message that the applied force needs to be increased.");
-    addPort("out_force_too_high", out_force_too_high_ ).doc( "Message that the applied force needs to be decreased.");
-    addPort("out_force", out_force_ ).doc( "force.");
+	/**
+	* Constructor of the OROCOS component.
+	*/
+	GielComponent::GielComponent( std::string const& _name ) : TaskContext( _name, PreOperational )
+	, msg_force_data_( 6, 0 )
+	, msg_force_data_compensated_( 6, 0 )
+	, msg_wrench_()
+	, msg_pose_data_(6, 0)
+	, msg_pose_()
+	, msg_sensor_compensation_params_(6,0)
+	, msg_stiff_force_z_( 0, 0 )
+	, msg_stiff_pose_z_()
+	, sensor_compensation_(false)
+	, sensor_compensation_type_(0)
+	, sensor_compensation_sample_size_(0)
+	, reduce_zero_noice_(false)
+	, reduce_zero_noice_cutoff_(0.0)
+	, stiffness_calculation_(0)
+	, stiffness_(0)
+	{
+		// Add ports. (addEventPort() for a port that wakes up the activity)
+		addPort("in_force_data", in_force_data_).doc( "The force data from the force sensor");
+		addPort("out_force_data", out_force_data_).doc( "The force data after processing");
+		addPort("out_wrench", out_wrench_).doc( "The force data in wrench format");
 
-    // Add operations.
+		addPort("in_pose_data", in_pose_data_).doc( "The pose data");
+		addPort("out_pose_data", out_pose_data_).doc( "The pose data after processing");
+		addPort("out_pose", out_pose_).doc( "The pose data in twist format");
 
-    // Show messages to the output ports to guarantee real-timeness.
-    out_force_too_low_.setDataSample( msg_force_too_low_);
-    out_force_too_high_.setDataSample( msg_force_too_high_);
-    out_force_.setDataSample( msg_force_);
+		addProperty("sensor_compensation",sensor_compensation_).doc("Flag to control sensor compensation");
+		addProperty("sensor_compensation_type", sensor_compensation_type_).doc("Type of sensor compensation");
+		addProperty("sensor_compensation_sample_size", sensor_compensation_sample_size_).doc("Amount of samples for auto sensor compensation");
+		addProperty("sensor_compensation_params_calculated", sensor_compensation_params_calculated_).doc("Flag to show if the compensation parameters are already calculated");
+		addProperty("reduce_zero_noice", reduce_zero_noice_).doc("Flag to enable the reduction of zero noice");
+		addProperty("reduce_zero_noice_cutoff", reduce_zero_noice_cutoff_).doc("Reduce zero noice cutoff");
+		addProperty("stiffness_calculation", stiffness_calculation_).doc("Flag to regulate stiffness calculation");
+		addProperty("stiffness", stiffness_).doc("Stiffness parameter");
 
-    // Message if completed
-    log( Info ) << "[" << getName( ) << "] Constructed" << endlog( );
+		std::vector<std::vector<double> > stiffness_data;
 
-}
 
-/**
- * This function is for the configuration code.
- * Return false to abort configuration.
- */
-bool GielComponent::configureHook( )
-{
-    if ( msg_force_too_low_ )
-        {
-            msg_force_too_low_ = false;
-        }
-    if ( msg_force_too_high_ )
-        {
-            msg_force_too_high_ = false;
-        }
+		// Show messages to the output ports to guarantee real-timeness.
+		out_force_data_.setDataSample( msg_force_data_);
+		out_pose_data_.setDataSample( msg_pose_data_);
+		out_wrench_.setDataSample( msg_wrench_);
+		out_pose_.setDataSample( msg_pose_);
+	}
 
-    log( Info ) << "[" << getName( ) << "] Configured" << endlog( );
-    return true;
-}
+	/**
+	* This function is for the configuration code.
+	* Return false to abort configuration.
+	*/
+	bool GielComponent::configureHook()
+	{
+		//return this->setPeriod(0.001); // set to 1000Hz execution mode.
+		//return true;
+	}
 
-/**
- * This function is for the application's start up code.
- * Return false to abort start up.
- */
-bool GielComponent::startHook( )
-{
-    // Set output ports and initial msgs.
-    msg_force_too_low_ = false ;
-    out_force_too_low_.write( msg_force_too_low_ );
+	/**
+	* This function is for the application's start up code.
+	* Return false to abort start up.
+	*/
+	bool GielComponent::startHook( )
+	{
 
-    msg_force_too_high_= false ;
-    out_force_too_high_.write(  msg_force_too_high_);
+		// Check validity of (all) Ports:
+		if ( !in_force_data_.connected() ) {
+			// No connection was made, can't do my job !
+			return false;
+		}
 
-    msg_force_ = 0.0;
-    out_force_.write( msg_force_ );
+		// Reset input ports.
+		in_force_data_.clear();
+		in_pose_data_.clear();
 
-    // Reset input ports.
-    in_force_data_.clear();
+		// Complete startHook()
+		return true;
+	}
 
-    // Reset flags.
+	/*
+	* Update hook of the OROCOS component.
+	*/
+	void GielComponent::updateHook( )
+	{
+		// Read the force data
+		in_force_data_.read( msg_force_data_ );
+		in_pose_data_.read( msg_pose_data_);
 
-    log( Info ) << "[" << getName( ) << "] Started" << endlog( );
-    return true;
-}
+		// Calculate sensor compensation Parameters
+		if (sensor_compensation_params_calculated_ == 1) {
+			msg_sensor_compensation_params_ = sensorCompensationParams(msg_force_data_, sensor_compensation_type_, sensor_compensation_sample_size_);
+			sensor_compensation_params_calculated_ = 2;
+		}
 
-/*
-    Update hook of the OROCOS component.
-*/
-void GielComponent::updateHook( )
-{
-    // Message if executing the updateHook
-    // std::cout << "giel_component executes updateHook !" <<std::endl;
+		// Apply Sensor compensation
+		if (sensor_compensation_) {
+			msg_force_data_compensated_ = sensorCompensation(msg_force_data_, msg_sensor_compensation_params_);
+			//if (reduce_zero_noice_) {
+				//msg_force_data_compensated_ = reduceZeroNoice(msg_force_data_compensated_, reduce_zero_noice_cutoff_);
+			//}
+		}
+		else {
+			msg_force_data_compensated_ = msg_force_data_;
+			//cout << "No sensor compensation";
+		}
 
-    if(in_force_data_.read( msg_force_data_) == RTT::NewData){
+		// Reduce Zero Noice
+		if (reduce_zero_noice_) {
+			msg_force_data_compensated_ = reduceZeroNoice(msg_force_data_compensated_, reduce_zero_noice_cutoff_);
+		}
 
-    in_force_data_.read( msg_force_data_);
+		msg_stiff_pose_z_.push_back(msg_pose_data_[0]);
 
-    double fx = msg_force_data_ [0];
-    //cout << fx;
-    double fy = msg_force_data_ [1];
-    //cout << fy;
-    double fz = msg_force_data_ [2];
-    //cout << fz;
-    msg_force_ = sqrt(fx*fx + fy*fy + fz*fz);
+		// Calculate stiffness
+		if (stiffness_calculation_ == 1) {
+			msg_stiff_force_z_.push_back(msg_force_data_compensated_[2]);
+			msg_stiff_pose_z_.push_back(msg_pose_data_[2]);
+		}
+		else if (stiffness_calculation_ == 2) {
+			stiffness_ = calc_stiffness(msg_stiff_force_z_, msg_stiff_pose_z_);
+		}
 
-    //if (msg_force_ == 0) {
-    //  msg_force_ = msg_force_pre_;
-    //}
-    msg_force_pre_ = msg_force_;
-    //cout << msg_force_;
-    out_force_.write(msg_force_);
 
-    //double fx = msg_force_data_;
+		// Create the wrench
+		msg_wrench_.force.x = msg_force_data_compensated_[0];
+		msg_wrench_.force.y = msg_force_data_compensated_[1];
+		msg_wrench_.force.z = msg_force_data_compensated_[2];
+		msg_wrench_.torque.x = msg_force_data_compensated_[3];
+		msg_wrench_.torque.y = msg_force_data_compensated_[4];
+		msg_wrench_.torque.z = msg_force_data_compensated_[5];
 
-    if (msg_force_ >= 6.00) {
-      //cout << "been here";
-      msg_force_too_low_ = false;
-      out_force_too_low_.write(msg_force_too_low_);
+		// Create the twist
+		msg_pose_.linear.x = msg_pose_data_[0];
+		msg_pose_.linear.y = msg_pose_data_[1];
+		msg_pose_.linear.z = msg_pose_data_[2];
+		msg_pose_.angular.x = msg_pose_data_[3];
+		msg_pose_.angular.y = msg_pose_data_[4];
+		msg_pose_.angular.z = msg_pose_data_[5];
 
-      msg_force_too_high_ = true;
-      out_force_too_high_.write(msg_force_too_high_);
-    }
-    else if (msg_force_  <= 3.00 ) {
-      msg_force_too_low_ = true;
-      out_force_too_low_.write(msg_force_too_low_);
 
-      msg_force_too_high_ = false;
-      out_force_too_high_.write(msg_force_too_high_);
-    }
-    else {
-      msg_force_too_low_ = false;
-      out_force_too_low_.write(msg_force_too_low_);
+		// Write force data to output-port
+		out_force_data_.write(msg_force_data_compensated_);
+		out_wrench_.write(msg_wrench_);
+		out_pose_data_.write(msg_pose_data_);
+		out_pose_.write(msg_pose_);
 
-      msg_force_too_high_ = false;
-      out_force_too_high_.write(msg_force_too_high_);
-    }
-  }
+	}
 
-}
+	/*
+	* Stop hook of the OROCOS component.
+	*/
+	void GielComponent::stopHook( )
+	{
 
-/*
-    Stop hook of the OROCOS component.
-*/
-void GielComponent::stopHook( )
-{
-    msg_force_too_low_ = false ;
-    out_force_too_low_.write(false);
+	}
 
-    msg_force_too_high_= false ;
-    out_force_too_high_.write(false);
+	/*
+	* Cleanup hook of the OROCOS component.
+	*/
+	void GielComponent::cleanupHook( )
+	{
+		//
+	}
 
-    msg_force_ = 0.0;
-    out_force_.write(0.0);
-
-    log( Info ) << "[" << getName( ) << "] Stopped" << endlog( );
-}
-
-/*
-    Cleanup hook of the OROCOS component.
-*/
-void GielComponent::cleanupHook( )
-{
-    log( Info ) << "[" << getName( ) << "] Cleaned up" << endlog( );
-}
-
-} // End of namespace Usconnector.
+} // End of namespace.
 
 ORO_CREATE_COMPONENT( gcomp::GielComponent )

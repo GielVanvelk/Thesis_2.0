@@ -12,6 +12,10 @@ require("geometric")
 maxvel = ctx:createInputChannelScalar("maxvel",0.5)
 maxacc = ctx:createInputChannelScalar("maxacc",0.5)
 
+-- ======================================== FRAMES ========================================
+-- The task frame corresponds to a frame defined in the robot definition
+tf = task_frame
+
 -- ========================================= VELOCITY PROFILE ===================================
 
 mp = create_motionprofile_trapezoidal()
@@ -65,3 +69,14 @@ Monitor{
         actionname='exit',
         expr=time-duration
 }
+
+-- ============================== OUTPUT PORTS===================================
+tf_origin = origin(tf)
+
+ctx:setOutputExpression("x_tf",coord_x(tf_origin))
+ctx:setOutputExpression("y_tf",coord_y(tf_origin))
+ctx:setOutputExpression("z_tf",coord_z(tf_origin))
+roll_tf, pitch_tf, yaw_tf = getRPY(rotation(tf))
+ctx:setOutputExpression("roll_tf",roll_tf)
+ctx:setOutputExpression("pitch_tf",pitch_tf)
+ctx:setOutputExpression("yaw_tf",yaw_tf)

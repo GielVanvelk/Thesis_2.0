@@ -25,6 +25,12 @@ W_Tx = ctx:createInputChannelScalar("W_Tx")
 W_Ty = ctx:createInputChannelScalar("W_Ty")
 W_Tz = ctx:createInputChannelScalar("W_Tz")
 
+Fx_comp = ctx:createInputChannelScalar("Fx_comp")
+Fy_comp = ctx:createInputChannelScalar("Fy_comp")
+Fz_comp = ctx:createInputChannelScalar("Fz_comp")
+Tx_comp = ctx:createInputChannelScalar("Tx_comp")
+Ty_comp = ctx:createInputChannelScalar("Ty_comp")
+Tz_comp = ctx:createInputChannelScalar("Tz_comp")
 
 max_joint_vels ={}
 min_joint_vels ={}

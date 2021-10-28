@@ -7,6 +7,8 @@ utils_ts = require("utils_ts")
 
 -- ========================================= PARAMETERS ===================================
 -- Default value is optional
+Fz_raw = ctx:createInputChannelScalar("Fz")
+print(Fz_raw)
 
 maxvel    = ctx:createInputChannelScalar("maxvel" ,0)
 maxacc    = ctx:createInputChannelScalar("maxacc" ,0)
@@ -17,7 +19,9 @@ delta_x   = ctx:createInputChannelScalar("delta_x",0)
 delta_y   = ctx:createInputChannelScalar("delta_y",0)
 delta_z   = ctx:createInputChannelScalar("delta_z",0)
 
-force     = ctx:createInputChannelScalar("force",0)
+force_setpoint     = ctx:createInputChannelScalar("force_setpoint",0)
+force_min          = ctx:createInputChannelScalar("force_min",0)
+force_max          = ctx:createInputChannelScalar("force_max",0)
 
 
 -- ======================================== FRAMES ========================================
@@ -43,7 +47,6 @@ startrot  = rotation(startpose)
 endpose   = startpose*translate_x(delta_x)*translate_y(delta_y)*translate_z(delta_z)
 endpos    = origin(endpose)
 endrot    = rotation(endpose)
-
 
 -- ========================================== GENERATE ORIENTATION PROFILE ============================
 
@@ -91,45 +94,6 @@ Constraint{
     priority= 2
 }
 
---[[
-Constraint{
-    context = ctx,
-    name    = "upper_force_limit",
-    expr    = inv(target)*tf,
-    K       = 3,
-    weight  = 1,
-    priority= 3
-}
-
-Constraint{
-    context = ctx,
-    name    = "lower_force_limit",
-    expr    = inv(target)*tf,
-    K       = 3,
-    weight  = 1,
-    priority= 3
-}
-
-
-Constraint{
-   context = ...
-   name = ...         [optional, default_name<nr>]
-   model = ...  (expression)
-   meas = ...   (expression)
-   expr = ...[ compatibility, if expr is used then model==expr and meas==expr ]
-   target = ...       [optional, 0.0] ( can be expression )
-   target_lower = ... [optional, 0.0] ( can be expression )
-   target_upper = ... [optional, 0.0] ( can be expression )
-   weight = ...       [optional, defaultweight, >= 0] ( can be expression )
-   priority = ...     [optional, defaultpriority, 0..2]
-   controller_lower = ....  [optional, 'proportional']
-   controller_upper = ....  [optional, 'proportional']
-   controller       = ....  [optional, 'proportional']
-   <controllerparameter> =... (can be expressions)
-   <controllerparameter>_lower or <controllerparameter>_upper (can be expressions)
-}
---]]
-
 -- =========================== MONITOR ============================================
 Monitor{
         context=ctx,
@@ -139,18 +103,15 @@ Monitor{
         expr=time-get_duration(mp) - constant(0.1)
 }
 
---[[
-Monitor {
+Monitor{
     context = ctx,
-    name = "force_monitor"
-    expr   = force, -- When expr exceeds the lower or upper bound, the event is triggered (only once).
-    lower = 3.00,
-    upper = 6.00,
+    name = "force_monitor",
+    expr   = Fz_raw, -- When expr exceeds the lower or upper bound, the event is triggered (only once).
+    upper = -5.00,
     actionname = "portevent",
-    argument = "e_force_too_low" -- sent flag to state machine
+    argument = "e_force_good" -- sent flag to state machine
 }
 
---]]
 -- ============================== OUTPUT PORTS===================================
 tf_origin = origin(tf)
 

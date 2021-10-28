@@ -6,16 +6,12 @@ utils_ts = require("utils_ts")
 -- INFO: https://etasl.pages.gitlab.kuleuven.be/etasl.html
 
 -- ========================================= PARAMETERS ===================================
+Fz_raw = ctx:createInputChannelScalar("Fz")
+
 maxvel            = ctx:createInputChannelScalar("maxvel" ,0)
 maxacc            = ctx:createInputChannelScalar("maxacc" ,0)
 endpose           = ctx:createInputChannelFrame("endpose")
 eqradius          = ctx:createInputChannelScalar("eq_r"   ,0)
-
---force_setpoint    = ctx:createInputChannelScalar("force_setpoint",0.0)
-force             = ctx:createInputChannelScalar("force",0)
-
-print(force)
-
 
 -- ======================================== FRAMES ========================================
 
@@ -33,11 +29,15 @@ s = Variable{
 
 startpose = initial_value(time, tf)
 startpos  = origin(startpose)
+print(startpos)
 startrot  = rotation(startpose)
 
 -- =============================== END POSE ==============================
 endpos    = origin(endpose)
+print(endpos)
+endpos[3] = startpos[3]
 endrot    = rotation(endpose)
+print(endpos)
 
 
 -- ========================================== GENERATE ORIENTATION PROFILE ============================
@@ -97,11 +97,20 @@ Monitor{
 
 Monitor {
     context = ctx,
-    name = "force_monitor",
-    expr = force, -- When expr exceeds the lower or upper bound, the event is triggered (only once).
-    upper = 3.00,
+    name = "force_monitor1",
+    expr = Fz_raw, -- When expr exceeds the lower or upper bound, the event is triggered (only once).
+    upper = -10,
     actionname = "portevent",
-    argument = "e_force_too_low" -- sent flag to state machine
+    argument = "decrease_force" -- sent flag to state machine
+}
+
+Monitor {
+    context = ctx,
+    name = "force_monitor2",
+    expr = Fz_raw, -- When expr exceeds the lower or upper bound, the event is triggered (only once).
+    lower = -2,
+    actionname = "portevent",
+    argument = "increase_force" -- sent flag to state machine
 }
 
 -- ============================== OUTPUT PORTS===================================

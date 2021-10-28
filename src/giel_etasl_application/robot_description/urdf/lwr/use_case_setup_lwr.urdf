@@ -326,4 +326,3 @@
   </joint>
   <link name="lwr_arm_hand_link"/>
 </robot>
-

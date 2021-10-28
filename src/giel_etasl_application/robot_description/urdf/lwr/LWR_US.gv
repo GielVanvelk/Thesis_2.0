@@ -1,0 +1,32 @@
+digraph G {
+node [shape=box];
+"world" [label="world"];
+"calib_lwr_arm_base_link" [label="calib_lwr_arm_base_link"];
+"lwr_arm_link_1" [label="lwr_arm_link_1"];
+"lwr_arm_link_2" [label="lwr_arm_link_2"];
+"lwr_arm_link_3" [label="lwr_arm_link_3"];
+"lwr_arm_link_4" [label="lwr_arm_link_4"];
+"lwr_arm_link_5" [label="lwr_arm_link_5"];
+"lwr_arm_link_6" [label="lwr_arm_link_6"];
+"lwr_arm_link_7" [label="lwr_arm_link_7"];
+"tip_link" [label="tip_link"];
+node [shape=ellipse, color=blue, fontcolor=blue];
+"world" -> "world_lwr_arm_base_joint" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"world_lwr_arm_base_joint" -> "calib_lwr_arm_base_link"
+"calib_lwr_arm_base_link" -> "lwr_arm_joint_0" [label="xyz: 0 0 0.11 \nrpy: 0 -0 0"]
+"lwr_arm_joint_0" -> "lwr_arm_link_1"
+"lwr_arm_link_1" -> "lwr_arm_joint_1" [label="xyz: 0 0 0.2 \nrpy: 0 -0 0"]
+"lwr_arm_joint_1" -> "lwr_arm_link_2"
+"lwr_arm_link_2" -> "lwr_arm_joint_2" [label="xyz: 0 0 0.2 \nrpy: 0 -0 0"]
+"lwr_arm_joint_2" -> "lwr_arm_link_3"
+"lwr_arm_link_3" -> "lwr_arm_joint_3" [label="xyz: 0 0 0.2 \nrpy: 0 -0 0"]
+"lwr_arm_joint_3" -> "lwr_arm_link_4"
+"lwr_arm_link_4" -> "lwr_arm_joint_4" [label="xyz: 0 0 0.2 \nrpy: 0 -0 0"]
+"lwr_arm_joint_4" -> "lwr_arm_link_5"
+"lwr_arm_link_5" -> "lwr_arm_joint_5" [label="xyz: 0 0 0.19 \nrpy: 0 -0 0"]
+"lwr_arm_joint_5" -> "lwr_arm_link_6"
+"lwr_arm_link_6" -> "lwr_arm_joint_6" [label="xyz: 0 0 0.078 \nrpy: 0 -0 0"]
+"lwr_arm_joint_6" -> "lwr_arm_link_7"
+"lwr_arm_link_7" -> "lwr_arm_hand_fixed_joint" [label="xyz: 0 0 0.28 \nrpy: 0 -0 0"]
+"lwr_arm_hand_fixed_joint" -> "tip_link"
+}

@@ -12,18 +12,10 @@ require "deployer_utils"
 
 -- ====================================== User Parameters =========================================
 
---robot_name: Choose the robot model: "ur_10" or "kinova_gen3" are currently supported
--- use_jr3: Use it if you want to integrate a jr3 wrench sensor
--- freq: Frequency [Hz] at which the eTaSL and the corresponding components run.
-
--- robot_name = "ur_10"
--- robot_name = "kinova_gen3"
--- robot_name = "franka_panda"
--- robot_name = "kuka_iiwa"
- robot_name = "kuka_lwr"
+robot_name = "kuka_lwr"
 use_jr3 = false
 freq = 200
-sensorfreq = 1/1000;
+sensorfreq = 1/250;
 
 -- ====================================== Standard deployment stuff =========================================
 rtt.setLogLevel("Warning")
@@ -83,6 +75,7 @@ depl:connectPeers("etaslcore","jointstate")
 -- ====================================== Output ports task
 etaslcore:add_etaslvar_outputport("tf_pose","Executed pose of the task frame",s{"x_tf","y_tf","z_tf","roll_tf","pitch_tf","yaw_tf"})
 etaslcore:add_etaslvar_inputport("force_sensor", "Force read from force sensor", s{"Fx", "Fy", "Fz", "Tx", "Ty", "Tz"}, d{0,0,0,0,0,0})
+etaslcore:add_etaslvar_inputport("force_compensated", "Compensated force signal", s{"Fx_comp", "Fy_comp", "Fz_comp", "Tx_comp", "Ty_comp", "Tz_comp"}, d{0,0,0,0,0,0})
 etaslcore:add_etaslvar_outputport("path_coordinate","Information of the path coordinate",s{"s"})
 
 -- ====================================== Configure eTaSL ports for the robot
@@ -146,12 +139,6 @@ reporter:reportPort("etaslcore","tf_pose")
 reporter:reportPort("etaslcore","path_coordinate")
 reporter:getProperty("ReportFile"):set(dir_path .. file_name)
 
--- ====================================== Force/Torque Sensor =========================================
-if not simulation and use_jr3 then
-    FTsensor = require("etasl_FT_JR3")
-    FTsensor.FTsensor_deployer(etaslcore,1/freq)
-end
-
 -- =====================　seom master + force sensor + components =========================================================　
 --
 
@@ -205,8 +192,25 @@ depl:setActivity(gcomp_gui:getName(), sensorfreq, 50, rtt.globals.ORO_SCHED_RT)
 
 --depl:stream( gcomp_gui:getName( )..".in_force_data" , rtt.provides( "ros" ):topic("chatter") ) -- for mock data publisher
 
+-- CONNECTION TO THE POSE OUTPUT OF ETASLCORE
+depl:connect(gcomp_gui:getName( )..".in_pose_data","etaslcore.tf_pose",cp )
+depl:stream( gcomp_gui:getName( )..".in_pose_data" , rtt.provides( "ros" ):topic("tf_pose") ) -- define were gcomp_gui can find a port
+
+-- CONNECTION TO THE FORCE SENSOR
 depl:connect(gcomp_gui:getName( )..".in_force_data", ati_iface:getName( )..".out_W_ati" ,cp ) -- to connect the output of ati-iface to the input of gcomp_gui
 depl:stream( gcomp_gui:getName( )..".in_force_data" , rtt.provides( "ros" ):topic("/wrench_raw") ) -- define were gcomp_gui can find a port
+
+-- CONNECTION TO THE FORCE INPUT OF ETASLCORE
+depl:connect(gcomp_gui:getName( )..".out_force_data","etaslcore.force_compensated",cp )
+depl:stream( gcomp_gui:getName( )..".out_force_data" , rtt.provides( "ros" ):topic("G_forceCompensated") )
+
+-- CONNECTION TO THE FORCE INPUT OF ETASLCORE
+--depl:connect(gcomp_gui:getName( )..".out_pose_data","etaslcore.force_compensated",cp )
+depl:stream( gcomp_gui:getName( )..".out_pose_data" , rtt.provides( "ros" ):topic("G_tf_pose") )
+
+-- WRENCH AND POSE
+depl:stream( gcomp_gui:getName( )..".out_wrench" , rtt.provides( "ros" ):topic("G_wrench") )
+depl:stream( gcomp_gui:getName( )..".out_pose" , rtt.provides( "ros" ):topic("G_pose") )
 
 gcomp_gui:configure()
 gcomp_gui:start()
@@ -220,9 +224,11 @@ define_property( sup, "robot_etasl_dir", "string", robot_etasl_dir, "Directory o
 define_property( sup, "depl_robot_file", "string", depl_robot_file, "Directory of the file containing deployment of the robot" )
 
 sup:exec_file(etasl_application_dir.."/scripts/components/fsm_component.lua")
-sup:getProperty("state_machine"):set(etasl_application_dir.."/scripts/rfsm/fsm_general3.lua")
+sup:getProperty("state_machine"):set(etasl_application_dir.."/scripts/rfsm/FSM_StiffnessCalculation.lua")
+
+sup:getProperty("viz_on"):set(false)
 sup:addPeer(depl)
--- depl:setActivity("Supervisor", 1/freq, 50, rtt.globals.ORO_SCHED_RT) --needed to use the time events of rfsm
+depl:setActivity("Supervisor", 1/freq, 50, rtt.globals.ORO_SCHED_RT) --needed to use the time events of rfsm
 sup:configure()
 sup:start()
 cmd = rttlib.port_clone_conn(sup:getPort("events"))

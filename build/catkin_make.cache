@@ -1,2 +1,2 @@
-
+ati_iface:force_data_publisher:giel_component:giel_etasl_application:kuka-robot-hardware/lwr_fri:kuka-robot-hardware/lwr_fri_msgs:kuka-robot-hardware/rtt_lwr_fri_msgs:motion_control/cartesian_motion_control:motion_control/motion_control_msgs:motion_control/naxes_motion_control:motion_control/rtt_motion_control_msgs:oro_extra:rtt_soem/soem_beckhoff_drivers:rtt_soem/soem_ebox:rtt_soem/soem_master:viz_marker
 -DCATKIN_DEVEL_PREFIX=/home/giel/etasl/ws/giel_workspace/devel -DCMAKE_INSTALL_PREFIX=/home/giel/etasl/ws/giel_workspace/install -G Unix Makefiles

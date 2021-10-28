@@ -10,7 +10,7 @@
 # Creates a component library libgui_connector-<target>.so
 # and installs in the directory lib/orocos/gui_connector/
 #
-orocos_component(giel_component giel_component.hpp giel_component.cpp) # ...you may add multiple source files
+orocos_component(giel_component giel_component.hpp giel_component_functions.cpp giel_component.cpp) # ...you may add multiple source files
 #
 # You may add multiple orocos_component statements.
 

@@ -21,10 +21,28 @@ endif()
 include( ${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake )
 
 # find dependencies
-find_package( catkin REQUIRED COMPONENTS cmake_modules )
-find_package( Eigen REQUIRED )
+find_package( catkin REQUIRED COMPONENTS cmake_modules)
+find_package( roscpp REQUIRED)
+find_package( rosbag REQUIRED)
+find_package( Eigen REQUIRED)
 
-include_directories(include ${catkin_INCLUDE_DIRS} ${Eigen_INCLUDE_DIRS})
+include_directories(include
+	${catkin_INCLUDE_DIRS} 
+	${Eigen_INCLUDE_DIRS} 
+	${roscpp_INCLUDE_DIRS} 
+	${rosbag_INCLUDE_DIRS}
+)
+
+#catkin_package(
+# INCLUDE_DIRS include
+#  CATKIN_DEPENDS
+#    rosbag
+#    roscpp
+#)
+
+#add_library(${giel_component} ${${giel_component}_SRCS})
+#add_library(giel_comp src/giel_component.cpp)
+#target_link_libraries(giel_component ${rosbag_LIBRARIES})
 
 # Rest of the configuration is in src/
 add_subdirectory( src )
