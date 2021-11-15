@@ -14,8 +14,8 @@ require "deployer_utils"
 
 robot_name = "kuka_lwr"
 use_jr3 = false
-freq = 200
-sensorfreq = 1/250;
+freq = 1000
+sensorfreq = 1/freq
 
 -- ====================================== Standard deployment stuff =========================================
 rtt.setLogLevel("Warning")
@@ -74,8 +74,9 @@ depl:connectPeers("etaslcore","jointstate")
 
 -- ====================================== Output ports task
 etaslcore:add_etaslvar_outputport("tf_pose","Executed pose of the task frame",s{"x_tf","y_tf","z_tf","roll_tf","pitch_tf","yaw_tf"})
-etaslcore:add_etaslvar_inputport("force_sensor", "Force read from force sensor", s{"Fx", "Fy", "Fz", "Tx", "Ty", "Tz"}, d{0,0,0,0,0,0})
+etaslcore:add_etaslvar_inputport("force_sensor", "Force read from force sensor", s{"Fx_raw", "Fy_raw", "Fz_raw", "Tx_raw", "Ty_raw", "Tz_raw"}, d{0,0,0,0,0,0})
 etaslcore:add_etaslvar_inputport("force_compensated", "Compensated force signal", s{"Fx_comp", "Fy_comp", "Fz_comp", "Tx_comp", "Ty_comp", "Tz_comp"}, d{0,0,0,0,0,0})
+etaslcore:add_etaslvar_outputport("Fz_des","The desired force in the Z-direction",s{"Fz_desired"})
 etaslcore:add_etaslvar_outputport("path_coordinate","Information of the path coordinate",s{"s"})
 
 -- ====================================== Configure eTaSL ports for the robot
@@ -212,6 +213,13 @@ depl:stream( gcomp_gui:getName( )..".out_pose_data" , rtt.provides( "ros" ):topi
 depl:stream( gcomp_gui:getName( )..".out_wrench" , rtt.provides( "ros" ):topic("G_wrench") )
 depl:stream( gcomp_gui:getName( )..".out_pose" , rtt.provides( "ros" ):topic("G_pose") )
 
+-- WRENCH AND POSE FOR STIFFNESS CALCULATION
+depl:stream( gcomp_gui:getName( )..".out_stiffness_wrench" , rtt.provides( "ros" ):topic("G_stiffness_wrench") )
+depl:stream( gcomp_gui:getName( )..".out_stiffness_pose" , rtt.provides( "ros" ):topic("G_stiffness_pose") )
+
+-- TRANSITION FLAG
+depl:stream( gcomp_gui:getName( )..".out_state_transition_flag" , rtt.provides( "ros" ):topic("G_state_trans") )
+
 gcomp_gui:configure()
 gcomp_gui:start()
 
@@ -224,7 +232,7 @@ define_property( sup, "robot_etasl_dir", "string", robot_etasl_dir, "Directory o
 define_property( sup, "depl_robot_file", "string", depl_robot_file, "Directory of the file containing deployment of the robot" )
 
 sup:exec_file(etasl_application_dir.."/scripts/components/fsm_component.lua")
-sup:getProperty("state_machine"):set(etasl_application_dir.."/scripts/rfsm/FSM_StiffnessCalculation.lua")
+sup:getProperty("state_machine"):set(etasl_application_dir.."/scripts/rfsm/FSM_StiffnessTest.lua")
 
 sup:getProperty("viz_on"):set(false)
 sup:addPeer(depl)
@@ -239,3 +247,8 @@ if not simulation then
 end
 depl:connect("etaslcore.eventPort","Supervisor.events",cp)
 depl:stream("etaslcore.joint_state", ros:topic("/joint_states"))
+depl:stream("etaslcore.Fz_des", ros:topic("/Fz_desired"))
+function restart()
+	local cmd = rttlib.port_clone_conn(sup:getPort("events"))
+	cmd:write("e_restart")
+end

@@ -11,12 +11,12 @@ require("geometric")
 -- robot.etasl_specification()
 -- ==================== Input Ports =====================================
 
-Fx_raw = ctx:createInputChannelScalar("Fx")
-Fy_raw = ctx:createInputChannelScalar("Fy")
-Fz_raw = ctx:createInputChannelScalar("Fz")
-Tx_raw = ctx:createInputChannelScalar("Tx")
-Ty_raw = ctx:createInputChannelScalar("Ty")
-Tz_raw = ctx:createInputChannelScalar("Tz")
+Fx_raw = ctx:createInputChannelScalar("Fx_raw")
+Fy_raw = ctx:createInputChannelScalar("Fy_raw")
+Fz_raw = ctx:createInputChannelScalar("Fz_raw")
+Tx_raw = ctx:createInputChannelScalar("Tx_raw")
+Ty_raw = ctx:createInputChannelScalar("Ty_raw")
+Tz_raw = ctx:createInputChannelScalar("Tz_raw")
 
 W_Fx = ctx:createInputChannelScalar("W_Fx")
 W_Fy = ctx:createInputChannelScalar("W_Fy")
@@ -44,6 +44,8 @@ end
 -- ==================== Output ports ==================================
 
 ctx:setOutputExpression("FT_frame",FT_frame)
+
+ctx:setOutputExpression("Fz_desired",constant(0.0))
 
 ctx:setOutputExpression("x_tf",constant(0))
 ctx:setOutputExpression("y_tf",constant(0))
