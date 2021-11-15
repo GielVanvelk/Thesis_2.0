@@ -13,8 +13,9 @@ require("rfsm_timeevent")
 gettime = rtt.getTime
 rfsm_timeevent.set_gettime_hook(gettime)
 
-require("FSM_functions")
-require("FSM_states")
+require("FSM_Functions")
+require("FSM_States")
+require("FSM_UserInput")
 
 gs=rtt.provides()
 
@@ -45,123 +46,113 @@ cp=rtt.Variable("ConnPolicy")
 etasl_application_dir = rtt.provides("ros"):find("giel_etasl_application")
 
 --===========================================================================================
---                                  OPERATOR INPUT
---===========================================================================================
-
--- Use real robot?
-use_real_robot = false
-
--- Specify safe operating domain.
-op_domain = {-0.0, -0.5, -0.25, 0.25, 0.07, 0.6} --{x_lower, x_upper, y_lower, y_upper, z_lower, z_upper} [m]
-
--- Specify Relevant Poses
-home_pose = {-0.40, 0, 0.4, 3.14, 0, 3.14} 			--[m]
-starting_pose = {-0.35, -0.1, 0.25, 3.14, 0, 3.14}  --[m]
-end_pose = {-0.35, 0.1, 0.25, 3.14, 0, 3.14} 		--[m]
-
--- Check if all poses are safe.
-all_coordinates_safe = check_all_coordinates(op_domain, home_pose, starting_pose, end_pose)
-
--- Velocity and Acceleration Limits
-if use_real_robot then
-	max_vel = 0.2 			--[m/s]
-	max_acc= 0.2 			--[m/s^2]
-	scanning_vel = 0.02 	--[m/s]
-else
-	max_vel = 0.5 			--[m/s]
-	max_acc= 0.5 			--[m/s^2]
-	scanning_vel = 0.1 		--[m/s]
-end
-
--- Force Parameters
-force_setpoint = -4.0		--[N]
-force_min = 2 				--[N]
-force_max = 10				--[N]
-
--- Force/Torque limits
-force_torque_limits = {10, 10, 10, 1.5, 1.2, 0.3} --[N, Nm]
-
--- Sensor Compenstation
-sensor_compensation = false
-sensor_compensation_type = 1  --0:manual, 1:auto
-sensor_comp_sample_size = 10000
-reduce_zero_noice = false
-reduce_zero_noice_cutoff = 0.01
-
--- Stiffness
-automatic_stiffness_calc = false
-custom_stiffness = 0.1
-
-
---===========================================================================================
 --                                     DEFINE FSM
 --===========================================================================================
 
 return rfsm.state {
 
 	--============================================
-	--CONFIGURATION STATE
+	-- CONFIGURATION STATE
 	--============================================
 	configured = rfsm.state {
 		entry=function(fsm)
-			state_configure_robot(fsm)
+			state_configure_robot(fsm, sensor_tool_frame_transf)
 		end,
 	},
-
-	--============================================
-	-- SAFETY CHECK STATE
-	--============================================
-	safety_check = rfsm.state {
-	   entry=function(fsm, all_safe_coordinates)
-		   print('Doing a safety check.')
-		   state_safety_check(fsm)
-	   end,
-	   exit=function()
-			 etaslcore:stop()
-			 etaslcore:cleanup()
-	   end,
-	},
-
-	--============================================
-	-- GET THE REAL ROBOT READY
-	--============================================
-	get_robot_ready = rfsm.state {
-       entry=function()
-		   print('Get the real robot ready.')
-		   configure_basic_etaslcore()
-		   rtt.sleep(2,0) --Sleep for 2 seconds
-       end,
-       exit=function()
-             etaslcore:stop()
-             etaslcore:cleanup()
-       end,
-    },
 
 	--============================================
 	-- ERROR STATE
 	--============================================
 	error = rfsm.state {
 	   entry=function()
+		   rtt.sleep(1,0) --Sleep for 2 seconds
+		   tr_flag = gcomp_gui:getProperty("pr_state_transition_flag")
+		   tr_flag:set(0)
 		   configure_basic_etaslcore()
 		   print(" AN ERROR OCCURED --> PROGRAM STOPPED")
 	   end,
 	   exit=function()
 			 etaslcore:stop()
 			 etaslcore:cleanup()
+			 tr_flag = gcomp_gui:getProperty("pr_state_transition_flag")
+			 tr_flag:set(1)
 	   end,
    },
+
+   --============================================
+   -- GET THE REAL ROBOT READY
+   --============================================
+   get_robot_ready = rfsm.state {
+		 entry=function()
+			 rtt.sleep(1,0) --Sleep for 2 seconds
+			 tr_flag = gcomp_gui:getProperty("pr_state_transition_flag")
+			 tr_flag:set(0)
+			 print('Get the real robot ready.')
+  		   	 configure_basic_etaslcore()
+		 end,
+		 exit=function()
+			   etaslcore:stop()
+			   etaslcore:cleanup()
+			   tr_flag = gcomp_gui:getProperty("pr_state_transition_flag")
+			   tr_flag:set(1)
+		 end,
+	 },
+
+	--============================================
+	-- SAFETY CHECK STATE
+	--============================================
+	safety_check = rfsm.state {
+	   entry=function(fsm)
+		   rtt.sleep(1,0) --Sleep for 2 seconds
+		   tr_flag = gcomp_gui:getProperty("pr_state_transition_flag")
+		   tr_flag:set(0)
+		   print('Doing a safety check.')
+		   state_safety_check(fsm, all_safe_coordinates)
+	   end,
+	   exit=function()
+			 etaslcore:stop()
+			 etaslcore:cleanup()
+			 tr_flag = gcomp_gui:getProperty("pr_state_transition_flag")
+			 tr_flag:set(1)
+	   end,
+	},
+
+	--============================================
+	-- MOVE TO HOME POSE
+	--============================================
+	move_to_home_pose = rfsm.state {
+	   entry=function()
+		   rtt.sleep(1,0) --Sleep for 2 seconds
+		   tr_flag = gcomp_gui:getProperty("pr_state_transition_flag")
+		   tr_flag:set(0)
+		   print('Moving to home position.')
+		   state_initial_movement(max_vel, max_acc, force_torque_limits)
+		   rtt.sleep(2,0) --Sleep for 2 seconds
+	   end,
+	   exit=function()
+			 etaslcore:stop()
+			 etaslcore:cleanup()
+			 tr_flag = gcomp_gui:getProperty("pr_state_transition_flag")
+			 tr_flag:set(1)
+	   end,
+	},
 
 	--============================================
 	-- IDLE STATE
 	--============================================
 	idle = rfsm.state {
 		entry=function(fsm)
-		    print('Going idle.')
+			rtt.sleep(1,0) --Sleep for 2 seconds
+			tr_flag = gcomp_gui:getProperty("pr_state_transition_flag")
+			tr_flag:set(0)
+			print('Going idle.')
 			state_idle(fsm, sensor_compensation)
 		end,
 		exit=function()
 			etaslcore:stop()
 			etaslcore:cleanup()
+			tr_flag = gcomp_gui:getProperty("pr_state_transition_flag")
+			tr_flag:set(1)
 		end,
 	},
 
@@ -170,8 +161,11 @@ return rfsm.state {
 	--============================================
 	sensor_compensation = rfsm.state {
 		entry=function(fsm)
+			rtt.sleep(1,0) --Sleep for 2 seconds
+			tr_flag = gcomp_gui:getProperty("pr_state_transition_flag")
+			tr_flag:set(0)
 		    print('Start calculating sensor compensation parameters.')
-			state_sensor_compensation(fsm, sensor_compensation, sensor_comp_sample_size, sensor_compensation_type, reduce_zero_noice, reduce_zero_noice_cutoff)
+			state_sensor_compensation(fsm, sensor_compensation, sensor_comp_sample_size, sensor_compensation_type, reduce_zero_noice, reduce_zero_noice_cutoff, use_fifo_buffer, fifo_buffer_size)
 		end,
 		doo = function(fsm)
 			prop = gcomp_gui:getProperty("sensor_compensation_params_calculated")
@@ -186,22 +180,9 @@ return rfsm.state {
 		exit=function()
 			etaslcore:stop()
 			etaslcore:cleanup()
+			tr_flag = gcomp_gui:getProperty("pr_state_transition_flag")
+			tr_flag:set(1)
 		end,
-	},
-
-	--============================================
-	-- MOVE TO HOME POSE
-	--============================================
-	move_to_home_pose = rfsm.state {
-	   entry=function()
-		   print('Moving to home position.')
-		   state_initial_movement(max_vel, max_acc)
-		   rtt.sleep(2,0) --Sleep for 2 seconds
-	   end,
-	   exit=function()
-			 etaslcore:stop()
-			 etaslcore:cleanup()
-	   end,
 	},
 
 	--============================================
@@ -209,28 +190,84 @@ return rfsm.state {
 	--============================================
 	move_to_starting_pose = rfsm.state {
 		entry=function()
+			rtt.sleep(1,0) --Sleep for 2 seconds
+			tr_flag = gcomp_gui:getProperty("pr_state_transition_flag")
+			tr_flag:set(0)
 			print('Moving to start position.')
 			state_move_to_pose_WF(starting_pose, max_vel, max_acc, force_torque_limits)
-			rtt.sleep(2,0) --Sleep for 2 seconds
 		end,
 		exit=function()
 			etaslcore:stop()
 			etaslcore:cleanup()
+			tr_flag = gcomp_gui:getProperty("pr_state_transition_flag")
+			tr_flag:set(1)
 		end,
 	},
 
 	--============================================
-	-- APPLY FORCE
+	-- STIFFNESS CALCULATION
 	--============================================
-	apply_force = rfsm.state {
+	stiffness_calculation = rfsm.state {
 		entry=function()
-			print('Applying force and calculate stiffness')
-			state_increase_force(max_vel, max_acc, force_setpoint, max_z, stiffness)
-			rtt.sleep(2,0) --Sleep for 2 seconds
+			rtt.sleep(1,0) --Sleep for 2 seconds
+			tr_flag = gcomp_gui:getProperty("pr_state_transition_flag")
+			tr_flag:set(0)
+			print('Starting stiffness calculation.')
+			state_stiffness_calculation(stiffness_calc_vel, max_acc, max_z_stiffness_calculation, force_torque_limits, force_setpoint, a_k_calc_force_start, a_k_calc_force_stop)
+		end,
+		exit=function()
+			stiffness_calc = gcomp_gui:getProperty("stiffness_calculation")
+			stiffness_calc:set(2)
+			etaslcore:stop()
+			etaslcore:cleanup()
+			tr_flag = gcomp_gui:getProperty("pr_state_transition_flag")
+			tr_flag:set(1)
+		end,
+	},
+
+	--============================================
+	-- SCANNING
+	--============================================
+	scanning = rfsm.state {
+		entry=function()
+			rtt.sleep(1,0) --Sleep for 2 seconds
+			tr_flag = gcomp_gui:getProperty("pr_state_transition_flag")
+			tr_flag:set(0)
+			print('Start scanning.')
+			k = gcomp_gui:getProperty("stiffness")
+			k_val = k:get()
+			--print(k_val)
+			if (k_val ==0) then
+				k_val = custom_stiffness
+			end
+			print(k_val)
+			state_scanning(end_pose, scanning_vel, max_acc, force_setpoint, k_val, force_torque_limits)
 		end,
 		exit=function()
 			etaslcore:stop()
 			etaslcore:cleanup()
+			tr_flag = gcomp_gui:getProperty("pr_state_transition_flag")
+			tr_flag:set(1)
+		end,
+	},
+
+	--============================================
+	-- FINISHED: MOVE BACK HOME AND STOP
+	--============================================
+	finished = rfsm.state {
+		entry=function()
+			rtt.sleep(1,0) --Sleep for 2 seconds
+			tr_flag = gcomp_gui:getProperty("pr_state_transition_flag")
+			tr_flag:set(0)
+		   print('FINISHED: MOVING HOME AND STOPPING')
+ 		   state_finished(max_vel, max_acc, force_torque_limits)
+ 		   rtt.sleep(2,0) --Sleep for 2 seconds
+	    end,
+		exit=function()
+			etaslcore:stop()
+			etaslcore:cleanup()
+			tr_flag = gcomp_gui:getProperty("pr_state_transition_flag")
+			tr_flag:set(1)
 		end,
 	},
 
@@ -251,7 +288,12 @@ return rfsm.state {
 	rfsm.trans {src="sensor_compensation",       tgt="error",                      events={"e_sensor_comp_error"}   },
 	rfsm.trans {src="idle",                      tgt="move_to_starting_pose",      events={"e_idle"}                },
 
-	rfsm.trans {src="move_to_starting_pose",     tgt="error",                      events={"e_force_too_high"}      },
-	rfsm.trans {src="move_to_starting_pose",     tgt="error",                      events={"e_torque_too_high"}     },
+	rfsm.trans {src="move_to_starting_pose",     tgt="stiffness_calculation",      events={'e_finished@etaslcore'}  },
+	rfsm.trans {src="stiffness_calculation",     tgt="error",   				   events={'e_finished@etaslcore'}  },
+	rfsm.trans {src="stiffness_calculation",     tgt="scanning",     			   events={'e_forceReached'}        },
+	rfsm.trans {src="stiffness_calculation",     tgt="error",     			       events={'e_force_too_high'}      },
+	rfsm.trans {src="stiffness_calculation",     tgt="error",     			       events={'e_torque_too_high'}     },
+	rfsm.trans {src="scanning",                  tgt="finished",     			   events={'e_finished@etaslcore'}  },
 
+	--rfsm.trans {src="finished",                  tgt="move_to_starting_pose",      events={'e_restart'}             },
 }
