@@ -232,7 +232,7 @@ define_property( sup, "robot_etasl_dir", "string", robot_etasl_dir, "Directory o
 define_property( sup, "depl_robot_file", "string", depl_robot_file, "Directory of the file containing deployment of the robot" )
 
 sup:exec_file(etasl_application_dir.."/scripts/components/fsm_component.lua")
-sup:getProperty("state_machine"):set(etasl_application_dir.."/scripts/rfsm/FSM_StiffnessTest.lua")
+sup:getProperty("state_machine"):set(etasl_application_dir.."/scripts/rfsm/FSM_Test3.lua")
 
 sup:getProperty("viz_on"):set(false)
 sup:addPeer(depl)
