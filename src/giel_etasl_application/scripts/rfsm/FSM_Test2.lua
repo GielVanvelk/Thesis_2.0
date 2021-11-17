@@ -56,7 +56,7 @@ return rfsm.state {
 	--============================================
 	configured = rfsm.state {
 		entry=function(fsm)
-			state_configure_robot(fsm, sensor_tool_frame_transf)
+			state_configure_robot(fsm, sensor_tool_frame_transf, use_real_robot)
 		end,
 	},
 
@@ -146,7 +146,8 @@ return rfsm.state {
 			tr_flag = gcomp_gui:getProperty("pr_state_transition_flag")
 			tr_flag:set(0)
 			print('Going idle.')
-			state_idle(fsm, sensor_compensation)
+			rtt.sleep(2,0) --Sleep for 2 seconds
+			rfsm.send_events(fsm, "e_idle")
 		end,
 		exit=function()
 			etaslcore:stop()
@@ -189,11 +190,7 @@ return rfsm.state {
 	-- MOVE TO STARTING POSE
 	--============================================
 	move_to_starting_pose = rfsm.state {
-		entry=function(fsm)
-			if testpoint_flag == testpoints_amount then
-				rfsm.send_events(fsm, "e_finished")
-			end
-			starting_pose[2] = testpoint_distance * testpoint_flag
+		entry=function()
 			rtt.sleep(1,0) --Sleep for 2 seconds
 			tr_flag = gcomp_gui:getProperty("pr_state_transition_flag")
 			tr_flag:set(0)
@@ -205,20 +202,19 @@ return rfsm.state {
 			etaslcore:cleanup()
 			tr_flag = gcomp_gui:getProperty("pr_state_transition_flag")
 			tr_flag:set(1)
-			testpoint_flag = testpoint_flag + 1
 		end,
 	},
 
 	--============================================
-	-- Initial Force
+	-- STIFFNESS CALCULATION
 	--============================================
-	initial_force= rfsm.state {
+	stiffness_calculation = rfsm.state {
 		entry=function()
 			rtt.sleep(1,0) --Sleep for 2 seconds
 			tr_flag = gcomp_gui:getProperty("pr_state_transition_flag")
 			tr_flag:set(0)
-			print('Applying the initial force.')
-			state_initial_force(stiffness_calc_vel, max_acc, max_z_stiffness_calculation, force_torque_limits, a_k_calc_force_start, a_k_calc_force_stop)
+			print('Starting stiffness calculation.')
+			state_stiffness_calculation(stiffness_calc_vel, max_acc, max_z_stiffness_calculation, force_torque_limits, force_setpoint, a_k_calc_force_start, a_k_calc_force_stop)
 		end,
 		exit=function()
 			stiffness_calc = gcomp_gui:getProperty("stiffness_calculation")
@@ -230,19 +226,81 @@ return rfsm.state {
 		end,
 	},
 
+
 	--============================================
-	-- STIFFNESS TEST
+	-- CHECKING CONTROL PARAMETERS
 	--============================================
-	stiffness_test = rfsm.state {
+	checking_control_parameters = rfsm.state {
 		entry=function(fsm)
 			rtt.sleep(1,0) --Sleep for 2 seconds
 			tr_flag = gcomp_gui:getProperty("pr_state_transition_flag")
 			tr_flag:set(0)
-			print('Starting Oscillating Movement.')
-			k_val = custom_stiffness
-			state_stiffness_test(max_vel, max_acc, max_z, k_val, force_torque_limits, a_k_calc_force_start, a_k_calc_force_stop, oscillation_freq, testing_time, K_controller)
+			print('Checking control parameters.')
+
+			print('The stiffness that will be used is:')
+			print(stiffness_custom)
+			if stiffness_custom > 500 then
+				print('>>> The stiffness looks OK!')
+				print('The controller gain that will be used is:')
+				print(controller_gain)
+				if controller_gain < 5 and controller_gain > 0.1 then
+					print(' >>> The controller gain looks OK!')
+					rfsm.send_events(fsm, "e_cp_ok")
+				else
+					print('The controller gain seems wrong --> assuming an error!')
+					rfsm.send_events(fsm, "e_cp_error")
+				end
+			else
+				print('The stiffness seems wrong --> assuming an error!')
+				rfsm.send_events(fsm, "e_cp_error")
+			end
+			rtt.sleep(2,0) --Sleep for 2 seconds
 		end,
-		exit=function(fsm)
+		exit=function()
+			etaslcore:stop()
+			etaslcore:cleanup()
+			tr_flag = gcomp_gui:getProperty("pr_state_transition_flag")
+			tr_flag:set(1)
+		end,
+	},
+
+	--============================================
+	-- MOVE TO FORCE SETPOINT
+	--============================================
+	move_to_force_setpoint = rfsm.state {
+		entry=function(fsm)
+			rtt.sleep(1,0) --Sleep for 2 seconds
+			tr_flag = gcomp_gui:getProperty("pr_state_transition_flag")
+			tr_flag:set(0)
+			print('Moving to the force setpoint.')
+			if a_k_calc_force_stop > force_setpoint then
+				movement_direction = -1 -- move up
+			else
+				movement_direction = 1 -- move down
+			end
+			state_move_to_force(stiffness_calc_vel, max_acc, max_z_stiffness_calculation, force_torque_limits, force_setpoint, movement_direction)
+			rtt.sleep(2,0) --Sleep for 2 seconds
+		end,
+		exit=function()
+			etaslcore:stop()
+			etaslcore:cleanup()
+			tr_flag = gcomp_gui:getProperty("pr_state_transition_flag")
+			tr_flag:set(1)
+		end,
+	},
+
+	--============================================
+	-- SCANNING
+	--============================================
+	scanning = rfsm.state {
+		entry=function()
+			rtt.sleep(1,0) --Sleep for 2 seconds
+			tr_flag = gcomp_gui:getProperty("pr_state_transition_flag")
+			tr_flag:set(0)
+			print('Start scanning.')
+			state_scanning(end_pose, scanning_vel, max_acc, force_setpoint, stiffness_custom, force_torque_limits, controller_gain)
+		end,
+		exit=function()
 			etaslcore:stop()
 			etaslcore:cleanup()
 			tr_flag = gcomp_gui:getProperty("pr_state_transition_flag")
@@ -271,7 +329,7 @@ return rfsm.state {
 	},
 
 	--============================================
-	-- TRAN
+	-- TRANSITIONS
 	--============================================
 	rfsm.trans {src="initial",                   tgt="configured"                                                   },
 	rfsm.trans {src="configured",                tgt="get_robot_ready",      	   events={"e_config_robot"}        },
@@ -282,19 +340,22 @@ return rfsm.state {
 	rfsm.trans {src="safety_check",              tgt="error",                      events={"e_safety_error"}        },
 
 	rfsm.trans {src="move_to_home_pose",         tgt="idle",                       events={'e_finished@etaslcore'}  },
-	rfsm.trans {src="idle",                      tgt="sensor_compensation",        events={"i_sensor_comp"}         },
-	rfsm.trans {src="sensor_compensation",       tgt="idle",                       events={"e_sensor_comp"}         },
-	rfsm.trans {src="sensor_compensation",       tgt="error",                      events={"e_sensor_comp_error"}   },
 	rfsm.trans {src="idle",                      tgt="move_to_starting_pose",      events={"e_idle"}                },
+	rfsm.trans {src="move_to_starting_pose",     tgt="sensor_compensation",        events={'e_finished@etaslcore'}  },
 
-	rfsm.trans {src="move_to_starting_pose",     tgt="initial_force",              events={'e_finished@etaslcore'}  },
-	rfsm.trans {src="initial_force",             tgt="error",   				   events={'e_finished@etaslcore'}  },
-	rfsm.trans {src="initial_force",             tgt="stiffness_test",     		   events={'e_forceReached'}        },
+	rfsm.trans {src="sensor_compensation",       tgt="error",                      events={"e_sensor_comp_error"}   },
+	rfsm.trans {src="sensor_compensation",       tgt="stiffness_calculation",      events={'e_sensor_comp'}  },
 
-	rfsm.trans {src="stiffness_test",            tgt="error",     			       events={'e_force_too_high'}      },
-	rfsm.trans {src="stiffness_test",            tgt="error",     			       events={'e_torque_too_high'}     },
-	rfsm.trans {src="stiffness_test",            tgt="move_to_starting_pose",      events={'e_finished@etaslcore'}  },
-	rfsm.trans {src="move_to_starting_pose",     tgt="finished",                   events={'e_finished'}            },
+	rfsm.trans {src="stiffness_calculation",     tgt="error",   				   events={'e_finished@etaslcore'}  },
+	rfsm.trans {src="stiffness_calculation",     tgt="error",     			       events={'e_force_too_high'}      },
+	rfsm.trans {src="stiffness_calculation",     tgt="error",     			       events={'e_torque_too_high'}     },
+	rfsm.trans {src="stiffness_calculation",     tgt="checking_control_parameters",events={'e_forceReached'}        },
 
-	--rfsm.trans {src="finished",                  tgt="move_to_starting_pose",      events={'e_restart'}             },
+	rfsm.trans {src="checking_control_parameters",tgt="error",                     events={"e_cp_error"}            },
+	rfsm.trans {src="checking_control_parameters",tgt="scanning",                   events={"e_cp_ok"}              },
+	--rfsm.trans {src="checking_control_parameters",tgt="move_to_force_setpoint",    events={"e_cp_ok"}              },
+
+	--rfsm.trans {src="move_to_force_setpoint",    tgt="scanning",                   events={"e_force_reached"}       },
+	rfsm.trans {src="move_to_force_setpoint",    tgt="error",                      events={'e_finished@etaslcore'}  },
+	rfsm.trans {src="scanning",                  tgt="finished",     			   events={'e_finished@etaslcore'}  },
 }

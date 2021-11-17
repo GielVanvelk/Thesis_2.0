@@ -4,7 +4,7 @@ local FSM_Functions =  {}
 -- CONFIGURE ROBOT STATE
 -- checks if the real robot is used and configures it if neccesary
 -- =================================================================================================================
-function state_configure_robot(fsm, sensor_tool_frame_transf)
+function state_configure_robot(fsm, sensor_tool_frame_transf, use_real_robot)
 	-- Configuration for Kuka iiwa: The driver of the iiwa needs to send zero velocities and wait a bit to configure
 	if robot.robot_name == "kuka_lwr" and not simulation then
 		local lwr = depl:getPeer("lwr")
@@ -37,10 +37,10 @@ function state_configure_robot(fsm, sensor_tool_frame_transf)
 	p7:set(sensor_tool_frame_transf[6])
 
 	-- Select correct transition
-	if simulation then
-		rfsm.send_events(fsm, "e_config_sim")
-	else
+	if simulation == false or use_real_robot == true then
 		rfsm.send_events(fsm, "e_config_robot")
+	else
+		rfsm.send_events(fsm, "e_config_sim")
 	end
 end
 
@@ -202,10 +202,39 @@ function state_stiffness_calculation(max_vel, max_acc, max_z, force_torque_limit
 end
 
 -- =================================================================================================================
+-- STATE MOVE TO FORCE SETPOINT
+-- move to the desired force setpoint
+-- =================================================================================================================
+function state_move_to_force(max_vel, max_acc, max_z, force_torque_limits, force_setpoint, movement_direction)
+	solver:create_and_set_solver("etaslcore")
+	etaslcore:readTaskSpecificationFile(robot_etasl_dir)
+	etaslcore:readTaskSpecificationFile(etasl_application_dir.."/scripts/etasl/default_ports.lua")
+	etaslcore:readTaskSpecificationFile(etasl_application_dir.."/scripts/etasl/Move_To_Force.lua")
+	etaslcore:set_etaslvar("maxvel", max_vel)
+	etaslcore:set_etaslvar("maxacc", max_acc)
+	etaslcore:set_etaslvar("eq_r",0.08)
+	etaslcore:set_etaslvar("delta_x", 0)
+	etaslcore:set_etaslvar("delta_y", 0)
+	etaslcore:set_etaslvar("delta_z", max_z)
+	etaslcore:set_etaslvar("force_setpoint",force_setpoint)
+	etaslcore:set_etaslvar("movement_direction",movement_direction)
+	etaslcore:set_etaslvar("global.force_x_limits", force_torque_limits[1])
+	etaslcore:set_etaslvar("global.force_y_limits", force_torque_limits[2])
+	etaslcore:set_etaslvar("global.force_z_limits", force_torque_limits[3])
+	etaslcore:set_etaslvar("global.torque_x_limits", force_torque_limits[4])
+	etaslcore:set_etaslvar("global.torque_y_limits", force_torque_limits[5])
+	etaslcore:set_etaslvar("global.torque_z_limits", force_torque_limits[6])
+	etaslcore:configure()
+	etaslcore:initialize()
+	etaslcore:start()
+	driver_particularities()
+end
+
+-- =================================================================================================================
 -- US SCANNING
 -- US Scanning while controlling the force
 -- =================================================================================================================
-function state_scanning(endframe, scanning_vel, max_acc, force_setpoint, stiffness_val, force_torque_limits)
+function state_scanning(endframe, scanning_vel, max_acc, force_setpoint, stiffness, force_torque_limits, controller_gain)
 	local endpose = rtt.Variable("KDL.Frame")
 	endpose.p:fromtab{X =endframe[1] ,Y= endframe[2],Z= endframe[3] }
 	endpose.M = rtt.provides("KDL"):provides("Rotation"):RPY(endframe[4] , endframe[5], endframe[6] )
@@ -217,7 +246,8 @@ function state_scanning(endframe, scanning_vel, max_acc, force_setpoint, stiffne
 	etaslcore:set_etaslvar("global.maxacc",max_acc)
 	etaslcore:set_etaslvar("global.eq_r",0.08)
 	etaslcore:set_etaslvar("global.force_set",force_setpoint)
-	etaslcore:set_etaslvar("global.stiffness_val",k_val)
+	etaslcore:set_etaslvar("global.stiffness_val",stiffness)
+	etaslcore:set_etaslvar("global.K_controller",controller_gain)
 	etaslcore:set_etaslvar("global.force_x_limits", force_torque_limits[1])
 	etaslcore:set_etaslvar("global.force_y_limits", force_torque_limits[2])
 	etaslcore:set_etaslvar("global.force_z_limits", force_torque_limits[3])

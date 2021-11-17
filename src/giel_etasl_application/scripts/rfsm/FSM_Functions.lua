@@ -74,6 +74,11 @@ function check_coordinates(op_domain, pose)
 
 end
 
+function set_transition_flag(flag)
+	tr_flag = gcomp_gui:getProperty("pr_state_transition_flag")
+	tr_flag:set(flag)
+end
+
 
 --==========================================================================
 --==========================================================================

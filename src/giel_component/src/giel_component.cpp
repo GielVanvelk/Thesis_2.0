@@ -247,32 +247,6 @@ namespace gcomp {
 		msg_pose_.angular.y = msg_pose_data_[4];
 		msg_pose_.angular.z = msg_pose_data_[5];
 
-
-		/**
-		// Create COSINUS
-		for (int i = 0; i<= 100; i++){
-			if(i ==0){
-				points.push_back(0);
-				x.push_back(-0.35);
-				y.push_back(0);
-				z.push_back(0.25);
-			}
-			else{
-				points.push_back(1/i);
-				x.push_back(-0.35);
-				y.push_back(0);
-				z.push_back(-1*cos(20/(i*2*3.1415)));
-			}
-		}
-		// Write data to file
-		std::ofstream myFile("cosinus.csv");
-		myFile << "x";
-		myFile.close();
-		**/
-
-
-
-
 		// STIFFNESS CALCULATION
 		// Stiffness_calculation_ = 0 --> No stiffness calculation done.
 		// Stiffness_calculation_ = 1 --> Stiffness calculation is being excecuted
