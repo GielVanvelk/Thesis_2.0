@@ -48,7 +48,32 @@ etasl_application_dir = rtt.provides("ros"):find("giel_etasl_application")
 --===========================================================================================
 --                                     DEFINE FSM
 --===========================================================================================
+--============================================
+-- MOVE TO Z FORCE STATE
+--============================================
+move_to_forceZ= rfsm.state {
+	entry=function()
+		print('Applying the initial force.')
+		rtt.sleep(1,0)
+		set_state_transition_flag(0)
 
+		if force_setpoint > a_k_calc_force_stop then
+			movement_direction = -1
+		elseif force_setpoint < a_k_calc_force_stop then
+			movement_direction = 1
+		else
+			movement_direction = 0
+		end
+
+
+		state_move_to_forceZ(stiffness_calc_vel, max_acc, max_z_stiffness_calculation, force_torque_limits, force_setpoint, movement_direction)
+	end,
+	exit=function()
+		etaslcore:stop()
+		etaslcore:cleanup()
+		set_state_transition_flag(1)
+	end,
+},
 return rfsm.state {
 
 	--============================================

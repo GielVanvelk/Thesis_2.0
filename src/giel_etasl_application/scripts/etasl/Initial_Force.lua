@@ -113,7 +113,7 @@ Monitor{
     context = ctx,
     name = "force_monitor",
 	expr= (force_stop - Fz),
-	upper= 0,
+	upper= 0.0,
     actionname = "portevent",
     argument = "e_forceReached" -- sent flag to state machine
 }

@@ -7,6 +7,7 @@ utils_ts = require("utils_ts")
 maxvel    = ctx:createInputChannelScalar("maxvel")
 maxacc    = ctx:createInputChannelScalar("maxacc")
 eqradius  = ctx:createInputChannelScalar("eq_r")
+
 delta_x   = ctx:createInputChannelScalar("delta_x")
 delta_y   = ctx:createInputChannelScalar("delta_y")
 delta_z   = ctx:createInputChannelScalar("delta_z")
@@ -18,7 +19,12 @@ tx_limits = ctx:createInputChannelScalar("torque_x_limits")
 ty_limits = ctx:createInputChannelScalar("torque_y_limits")
 tz_limits = ctx:createInputChannelScalar("torque_z_limits")
 
-force_stop = ctx:createInputChannelScalar("force_stop")
+force_set 	  = ctx:createInputChannelScalar("force_setpoint")
+force_tolerance   = ctx:createInputChannelScalar("force_tolerance", 0)
+stiffness         = ctx:createInputChannelScalar("stiffness_val" ,0)
+K_F               = ctx:createInputChannelScalar("K_controller" ,0)
+C_Fz              = 1/stiffness
+
 
 Fx = ctx:createInputChannelScalar("Fx_comp")
 Fy = ctx:createInputChannelScalar("Fy_comp")
@@ -26,6 +32,7 @@ Fz = ctx:createInputChannelScalar("Fz_comp")
 Tx = ctx:createInputChannelScalar("Tx_comp")
 Ty = ctx:createInputChannelScalar("Ty_comp")
 Tz = ctx:createInputChannelScalar("Tz_comp")
+
 
 -- ======================================== FRAMES ========================================
 
@@ -92,6 +99,16 @@ pos_vec = origin(task_frame_i)
 
 -- ========================== CONSTRAINT SPECIFICATION =================================
 Constraint{
+	context=ctx,
+	name= "force_control",
+	model =  coord_z(origin(tf)),
+	meas = 1*(C_Fz)*(Fz - force_set),
+	target = 0,
+	K = K_F,
+	priority = 1,
+};
+
+Constraint{
     context = ctx,
     name    = "follow_path",
     expr    = inv(target)*tf,
@@ -102,20 +119,11 @@ Constraint{
 
 ---=========================== MONITOR ============================================
 Monitor{
-        context=ctx,
-        name='finish_after_motion',
-        upper=0.0,
-        actionname='exit',
-        expr=time-get_duration(mp) - constant(0.1)
-}
-
-Monitor{
-    context = ctx,
-    name = "force_monitor",
-	expr= (force_stop - Fz),
-	upper= 0,
-    actionname = "portevent",
-    argument = "e_KCalcCompleted" -- sent flag to state machine
+	context=ctx,
+    name='force_reached',
+    upper=0.0,
+    actionname='exit',
+    expr=force_tolerance - abs(Fz - force_set)
 }
 
 Monitor{
