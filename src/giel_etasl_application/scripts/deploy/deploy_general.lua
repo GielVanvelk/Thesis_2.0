@@ -8,8 +8,6 @@ require "rttlib"
 require "rttros"
 require "deployer_utils"
 
---require "rtt_ros"
-
 -- ====================================== User Parameters =========================================
 
 robot_name = "kuka_lwr"
@@ -218,7 +216,7 @@ depl:stream( gcomp_gui:getName( )..".out_stiffness_wrench" , rtt.provides( "ros"
 depl:stream( gcomp_gui:getName( )..".out_stiffness_pose" , rtt.provides( "ros" ):topic("G_stiffness_pose") )
 
 -- TRANSITION FLAG
-depl:stream( gcomp_gui:getName( )..".out_state_transition_flag" , rtt.provides( "ros" ):topic("G_state_trans") )
+depl:stream( gcomp_gui:getName( )..".out_transition_flag" , rtt.provides( "ros" ):topic("G_state_trans") )
 
 gcomp_gui:configure()
 gcomp_gui:start()
@@ -232,7 +230,7 @@ define_property( sup, "robot_etasl_dir", "string", robot_etasl_dir, "Directory o
 define_property( sup, "depl_robot_file", "string", depl_robot_file, "Directory of the file containing deployment of the robot" )
 
 sup:exec_file(etasl_application_dir.."/scripts/components/fsm_component.lua")
-sup:getProperty("state_machine"):set(etasl_application_dir.."/scripts/rfsm/FSM_Test3.lua")
+sup:getProperty("state_machine"):set(etasl_application_dir.."/scripts/rfsm/FSM_ScanningTests.lua")
 
 sup:getProperty("viz_on"):set(false)
 sup:addPeer(depl)

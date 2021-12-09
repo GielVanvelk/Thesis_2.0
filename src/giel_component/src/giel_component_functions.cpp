@@ -1,7 +1,19 @@
 #include "giel_component.hpp"
+#include <iostream>
 
 namespace gcomp
 {
+	// Detect zero values in pose data
+	bool detect_zero_pose_data(std::vector < double > pose_data)
+	{
+		// if all pose values are 0 it means no pose data has been received
+		if (pose_data[0] == 0 && pose_data[1] == 0 && pose_data[2] == 0 && pose_data[3] == 0 && pose_data[4] == 0 && pose_data[5] == 0){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
 
 	// Force transformation from sensor frame to tool frame
 	std::vector < double > sensor_to_tool_frame(std::vector < double > force_data_sensor_frame, std::vector < double > transformation_params)
@@ -19,27 +31,15 @@ namespace gcomp
 		force_data_tool_frame[1] = force_data_sensor_frame[1];
 		force_data_tool_frame[2] = force_data_sensor_frame[2];
 		// The tool frame is translated along the z axis of the sensor frame.
-		force_data_tool_frame[3] = force_data_sensor_frame[3];
-		force_data_tool_frame[4] = force_data_sensor_frame[4];
+		force_data_tool_frame[3] = force_data_sensor_frame[3] - transformation_params[2]*force_data_sensor_frame[1];
+		force_data_tool_frame[4] = force_data_sensor_frame[4] - transformation_params[2]*force_data_sensor_frame[0];
 		force_data_tool_frame[5] = force_data_sensor_frame[5];
 		// Return the force data in the tool frame
 		return force_data_tool_frame;
 	}
 
-	// Detect zero values in pose data
-	bool detect_zero_pose_data(std::vector < double > pose_data)
-	{
-		// if all pose values are 0 it means no pose data has been received
-		if (pose_data[0] == 0 && pose_data[1] == 0 && pose_data[2] == 0 && pose_data[3] == 0 && pose_data[4] == 0 && pose_data[5] == 0){
-			return true;
-		}
-		else{
-			return false;
-		}
-	}
-
 	// Determine sensor compensation parameters
-	std::vector < double > sensorCompensationParams(std::vector < double > force_data, int comp_type ,int sample_size)
+	std::vector < double > sensorCompensationParams(std::vector < double > force_data, int sample_size)
 	{
 		std::vector<double> ss_params;
 		ss_params.push_back(0.0);
@@ -48,18 +48,7 @@ namespace gcomp
 		ss_params.push_back(0.0);
 		ss_params.push_back(0.0);
 		ss_params.push_back(0.0);
-		if (comp_type == 1){
-			ss_params = autoSensorCompensationParams(force_data, sample_size);
-		}
-		else{
-			// compensation for steady state error (according to normal direction)
-			ss_params[0] = 3.85; //force gets negative when pushing against the positive z axis (tf), (pushing against the probe)
-			ss_params[1] = 13.35; //force gets negative when pushing along positive y axis
-			ss_params[2] = -9.99; //force gets positive when pushing against the positive x axis (tf),
-			ss_params[3] = 0.0;
-			ss_params[4] = 0.0;
-			ss_params[5] = 0.0;
-		}
+		ss_params = autoSensorCompensationParams(force_data, sample_size);
 		return ss_params;
 	}
 
@@ -176,7 +165,6 @@ namespace gcomp
 	double calc_stiffness ( std::vector < double > force, std::vector < double > pose )
 	{
 		int number_of_data_samples = force.size();
-
 		double force_average = average_vector(force);
 		double pose_average = average_vector(pose);
 		double xy_sum = 0;
@@ -189,21 +177,11 @@ namespace gcomp
 			xy_sum = xy_sum + (y_diff * x_diff);
 			x_diff_kw_sum = x_diff_kw_sum + (x_diff * x_diff);
 		}
-
-		//double Fz1 = force[0];
-		//double Fz2 = force[number_of_data_samples-1];
-		//double Fdiff = Fz2 - Fz1; //[N]
-
-		//double Pz1 = pose[0];
-		//double Pz2 = pose[number_of_data_samples -1];
-		//double Pdiff = Pz2 - Pz1; //[m]
-
-		//double stiffness = Fdiff / Pdiff; //[N/m]
-
 		double stiffness = xy_sum/x_diff_kw_sum;
 		return stiffness;
 	}
 
+	//Function for sensor filtering
 	double sensor_filtering(std::vector < double > data, int size)
 	{
 		std::vector<double> forceZ_data_compensated;

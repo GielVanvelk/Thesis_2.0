@@ -7,12 +7,11 @@
 local FSM_UserInput =  {}
 
 -- Use real robot?
-use_real_robot = true
+use_real_robot = false
 
 --===========================================================================================
 --VELOCITIES & ACCELERATIONS
 --===========================================================================================
-
 if simulation or use_real_robot then
 	max_vel = 0.05   												--[m/s]
 	max_acc = 0.05													--[m/s^2]
@@ -29,35 +28,24 @@ end
 --FORCES AND TORQUES
 --===========================================================================================
 -- Specify force and torque limits. {Fx, Fy, Fz, Tx, Ty, Tz}
-force_torque_limits = {12, 12, 12, 12, 12, 12} 					-- [N,Nm]
+force_torque_limits = {12, 12, 12, 12, 12, 12} 						--[N,Nm]
 
 -- Sensor-frame to Tool-frame transformation. {x, y, z, rotX, rotY, rotZ}
 sensor_tool_frame_transf = {0, 0, -0.235, 0, 0, 0}					--[m, rad]
 
-force_setpoint = -4
-
 --===========================================================================================
 --SENSOR COMPENSATION
 --===========================================================================================
-
 -- Sensor Steady-State-Error Compenstation
 sensor_compensation = true
-sensor_compensation_type = 1  --0:manual, 1:auto
-sensor_comp_sample_size = 10000
-reduce_zero_noice = false
-reduce_zero_noice_cutoff = 0.02
-
--- FIFO Buffer
-use_fifo_buffer = false
-fifo_buffer_size = 1
+sensor_comp_sample_size = 10000										--[-]
 
 --===========================================================================================
 --STIFFNESS CALCULATION
 --===========================================================================================
-
 -- Stiffness
 automatic_stiffness_calc = false
-max_z_stiffness_calculation = 0.15  								--[m]
+max_z_stiffness_calculation = 0.08  								--[m]
 
 -- Stiffness Calculation Parameters
 a_k_calc_force_start = -2										    --[N]
@@ -66,7 +54,6 @@ a_k_calc_force_stop =  -8										    --[N]
 --===========================================================================================
 --STIFFNESS CALCULATION OSCILLATION
 --===========================================================================================
-
 testpoint_flag = 0
 oscillation_time = 2 --time of half a period
 oscillation_amount = 3
@@ -80,11 +67,18 @@ testpoint_distance = 0.005 --[m]
 test_total_distance = (testpoints_amount-1) * testpoint_distance 	--[m]
 
 --===========================================================================================
---CONTROLLER PARAMETERS
+--FORCE CONTROLLER PARAMETERS
 --===========================================================================================
+force_setpoint = -5 											    --[N]
+controller_gain = 1													--[-]
+stiffness_custom = 1000 										    --[N/m]
 
-controller_gain = 1
-stiffness_custom = 1000.0										    --[N/m]
+move_to_setpoint_first = true
+use_calculated_stiffness = true
+
+force_tolerance = 0.05												--[N]
+stiffness_limits = {800, 8000}									    --[N/m]
+controller_gain_limits = {0.5, 3}									--[-]
 
 --===========================================================================================
 --RELEVANT POSES

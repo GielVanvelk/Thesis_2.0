@@ -7,6 +7,11 @@ function driver_particularities()
 	end
 end
 
+function set_state_transition_flag(value)
+	tr_flag = gcomp_gui:getProperty("pr_transition_flag")
+	tr_flag:set(value)
+end
+
 function create_origin_matrix(pose)
 	origin_x = pose[1]
 	origin_y = pose[2]
@@ -78,6 +83,35 @@ function set_transition_flag(flag)
 	tr_flag = gcomp_gui:getProperty("pr_state_transition_flag")
 	tr_flag:set(flag)
 end
+
+function set_stiffness_calculation_flag(flag)
+	stiffness_calc = gcomp_gui:getProperty("pr_stiffness_calculation_flag")
+	stiffness_calc:set(flag)
+end
+
+function evaluate_control_parameters(fsm, stiffness, controller_gain, stiffness_limits, controller_gain_limits)
+	print('   >>> The stiffness that will be used is:',stiffness,'N/m')
+	if stiffness >= stiffness_limits[1] and stiffness <= stiffness_limits[2] then
+		print('   >>> The stiffness looks OK!')
+		print('   >>> The controller gain that will be used is:',controller_gain,'-')
+		if controller_gain >= controller_gain_limits[1] and controller_gain <= controller_gain_limits[2] then
+			print('   >>> The controller gain looks OK!')
+			if move_to_setpoint_first then
+				rfsm.send_events(fsm, "e_checkCP1")
+			else
+				rfsm.send_events(fsm, "e_checkCP2")
+			end
+		else
+			print('   >>> The controller gain seems wrong --> assuming an error!')
+			rfsm.send_events(fsm, "e_checkCP_error")
+		end
+	else
+		print('   >>> The stiffness seems wrong --> assuming an error!')
+		rfsm.send_events(fsm, "e_checkCP_error")
+	end
+	rtt.sleep(2,0)
+end
+
 
 
 --==========================================================================
