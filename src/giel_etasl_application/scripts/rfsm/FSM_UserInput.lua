@@ -74,7 +74,7 @@ controller_gain = 1													--[-]
 stiffness_custom = 1000 										    --[N/m]
 
 move_to_setpoint_first = true
-use_calculated_stiffness = true
+use_calculated_stiffness = false
 
 force_tolerance = 0.05												--[N]
 stiffness_limits = {800, 8000}									    --[N/m]

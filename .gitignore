@@ -41,7 +41,16 @@ qtcreator-*
 /planning/cfg
 /planning/docs
 /planning/src
-src/Rosbag/
+src/Rosbag/Basic Scripts
+src/Rosbag/OldVersions
+src/Rosbag/OldVersions2
+src/Rosbag/RecordedData
+src/Rosbag/Test1_Figures
+src/Rosbag/Test2_Figures
+src/Rosbag/Test3_Figures
+src/Rosbag/Test4_Figures
+src/Rosbag/Test4_Adaptive
+
 
 *~
 
@@ -50,3 +59,4 @@ src/Rosbag/
 
 # Catkin custom files
 CATKIN_IGNORE
+
